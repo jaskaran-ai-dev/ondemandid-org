@@ -1,20 +1,31 @@
+"use client"
+
 import Link from "next/link"
-import { ShieldCheck } from "lucide-react"
+import Image from "next/image"
+import { useTheme } from "@/components/theme-provider-custom"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export function SiteFooter() {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
+
   return (
     <footer className="border-t border-border/60 bg-secondary/40">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-6">
+      <div className="mx-auto flex items-center justify-center w-full max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-6">
         <div className="flex flex-col gap-3 max-w-sm">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span
-              aria-hidden
-              className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground"
-            >
-              <ShieldCheck className="size-3.5" />
+          <Link href="/" className="flex items-center gap-3 font-semibold">
+            <div className="relative size-24">
+              <Image
+                src={isDark ? "/logo-dark.webp" : "/logo-light.png"}
+                alt="iVALT Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-sm tracking-tight">
+              <span className="text-muted-foreground text-sm">OnDemand ID</span>
             </span>
-            <span className="text-sm tracking-tight">iVALT OnDemand ID</span>
           </Link>
           <p className="text-sm leading-relaxed text-muted-foreground">
             Password-free identity verification for the enterprise. Biometric
@@ -22,7 +33,7 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 justify-items-center">
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">
               Product
@@ -56,18 +67,13 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/#security" className="hover:text-foreground">
-                  Security
-                </Link>
-              </li>
-              <li>
-                <Link href="/#" className="hover:text-foreground">
+                <Link href="https://ivalt.com/contact" className="hover:text-foreground">
                   Contact
                 </Link>
               </li>
             </ul>
           </div>
-          <div className="col-span-2 sm:col-span-1">
+          {/* <div className="col-span-2 sm:col-span-1">
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">
               Legal
             </h3>
@@ -88,7 +94,7 @@ export function SiteFooter() {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="border-t border-border/60">
@@ -97,7 +103,7 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <span className="hidden sm:inline">Appearance</span>
             <ThemeToggle variant="compact" />
-            <span className="font-mono">v1.0 · OnDemand ID POC</span>
+            <span className="font-mono text-xs">v1.0 · OnDemand ID</span>
           </div>
         </div>
       </div>

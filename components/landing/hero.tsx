@@ -108,7 +108,7 @@ function FeaturePill({
 function PhoneMockup() {
   return (
     <div
-      className="anim-fade-up relative mx-auto w-full max-w-[260px] rounded-[2rem] border-[10px] border-foreground bg-foreground p-1 shadow-lg md:col-span-1"
+      className="anim-fade-up relative mx-auto w-full max-w-[260px] rounded-[2rem] border-[3px] p-1 shadow-lg md:col-span-1"
       style={{ animationDelay: "725ms" }}
     >
       <div className="rounded-[1.5rem] bg-background p-5">
