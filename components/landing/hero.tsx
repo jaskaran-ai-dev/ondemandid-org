@@ -44,7 +44,7 @@ export function Hero() {
               <ArrowRight className="ml-1 size-4" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+          <Button asChild size="lg" variant="outline" className="w-full sm:w-auto dark:hover:bg-white/10 dark:hover:text-white">
             <Link href="/ondemand-id">Try OnDemand ID</Link>
           </Button>
         </div>

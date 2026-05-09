@@ -68,9 +68,9 @@ export function Security() {
               as="article"
               direction="scale"
               delay={i * 100}
-              className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+              className="flex flex-col gap-4 border border-border border-dashed rounded-none bg-card p-6"
             >
-              <span className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <p.icon className="size-5" aria-hidden />
               </span>
               <h3 className="font-serif text-lg font-semibold tracking-tight">
@@ -79,7 +79,7 @@ export function Security() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {p.description}
               </p>
-              <ul className="mt-auto flex flex-col gap-2 border-t border-border pt-4 text-sm">
+              {/* <ul className="mt-auto flex flex-col gap-2 border-t border-border pt-4 text-sm">
                 {p.points.map((point) => (
                   <li
                     key={point}
@@ -92,7 +92,7 @@ export function Security() {
                     <span>{point}</span>
                   </li>
                 ))}
-              </ul>
+              </ul> */}
             </Reveal>
           ))}
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Source_Serif_4 } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
+import { CustomThemeProvider } from "@/components/theme-provider-custom"
 import { QueryProvider } from "@/components/query-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { SiteHeader } from "@/components/site-header"
@@ -47,17 +47,12 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground">
         <QueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <CustomThemeProvider defaultTheme="system" storageKey="ivalt-theme">
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
             <Toaster richColors position="top-center" />
-          </ThemeProvider>
+          </CustomThemeProvider>
         </QueryProvider>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

@@ -72,14 +72,14 @@ export function Features() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-none border border-none bg-border md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal
               key={f.title}
               delay={(i % 3) * 90}
-              className="flex flex-col gap-3 bg-card p-6 transition-colors hover:bg-secondary/40"
+              className="flex cursor-pointer flex-col gap-3 bg-card p-6 transition-colors hover:bg-secondary/90"
             >
-              <span className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <f.icon className="size-5" aria-hidden />
               </span>
               <h3 className="text-base font-semibold tracking-tight">

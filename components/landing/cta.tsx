@@ -40,7 +40,7 @@ export function CTA() {
             asChild
             size="lg"
             variant="outline"
-            className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground dark:border-none dark:text-white"
           >
             <Link href="/ondemand-id">Try OnDemand ID</Link>
           </Button>

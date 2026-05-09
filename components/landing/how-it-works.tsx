@@ -65,7 +65,7 @@ export function HowItWorks() {
               key={s.step}
               as="li"
               delay={i * 120}
-              className="relative flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+              className="relative flex flex-col gap-4 border border-border border-dashed rounded-none bg-card p-6"
             >
               <div className="flex items-center justify-between">
                 <span className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
