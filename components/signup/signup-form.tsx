@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BuildingIcon, UserIcon, Mail01Icon, PhoneCall, User02Icon, File01Icon } from "@hugeicons/core-free-icons"
 import { signupSchema, type SignupValues } from "@/lib/validation"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -58,6 +60,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             placeholder="Acme Corporation"
             aria-invalid={!!errors.companyName}
             disabled={submitting}
+            leftIcon={<HugeiconsIcon icon={BuildingIcon} size={18} />}
             {...register("companyName")}
           />
         </Field>
@@ -73,6 +76,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             autoComplete="name"
             aria-invalid={!!errors.contactName}
             disabled={submitting}
+            leftIcon={<HugeiconsIcon icon={UserIcon} size={18} />}
             {...register("contactName")}
           />
         </Field>
@@ -90,6 +94,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             autoComplete="email"
             aria-invalid={!!errors.email}
             disabled={submitting}
+            leftIcon={<HugeiconsIcon icon={Mail01Icon} size={18} />}
             {...register("email")}
           />
         </Field>
@@ -119,6 +124,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             }
             disabled={submitting}
             ariaInvalid={!!errors.mobile}
+            leftIcon={<HugeiconsIcon icon={PhoneCall} size={18} />}
           />
         </Field>
 
@@ -136,6 +142,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             inputMode="numeric"
             aria-invalid={!!errors.initialUsers}
             disabled={submitting}
+            leftIcon={<HugeiconsIcon icon={User02Icon} size={18} />}
             {...register("initialUsers", { valueAsNumber: true })}
           />
         </Field>

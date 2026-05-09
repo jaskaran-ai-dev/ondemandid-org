@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { SignupForm } from "@/components/signup/signup-form"
+import { useSignup } from "@/hooks/use-api"
 import type { SignupValues } from "@/lib/validation"
 
 type SuccessState = {
@@ -15,31 +15,21 @@ type SuccessState = {
 }
 
 export function SignupClient() {
-  const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState<SuccessState | null>(null)
+  const signupMutation = useSignup()
 
   async function handleSubmit(values: SignupValues) {
-    setSubmitting(true)
     try {
-      const res = await fetch("/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.ok) {
-        toast.error(data.error ?? "Signup failed. Please try again.")
-        return
+      const result = await signupMutation.mutateAsync(values)
+      if (result.ok) {
+        setSuccess({
+          id: crypto.randomUUID(),
+          companyName: values.companyName,
+          email: values.email,
+        })
       }
-      setSuccess({
-        id: data.id,
-        companyName: values.companyName,
-        email: values.email,
-      })
     } catch {
-      toast.error("Network error. Please try again.")
-    } finally {
-      setSubmitting(false)
+      // Error handling is done in the mutation
     }
   }
 
@@ -50,7 +40,7 @@ export function SignupClient() {
   return (
     <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
       <div className="rounded-xl border border-border bg-card p-6 md:p-8">
-        <SignupForm onSubmit={handleSubmit} submitting={submitting} />
+        <SignupForm onSubmit={handleSubmit} submitting={signupMutation.isPending} />
       </div>
       <aside className="flex flex-col gap-4">
         <div className="rounded-xl border border-border bg-secondary/40 p-6">

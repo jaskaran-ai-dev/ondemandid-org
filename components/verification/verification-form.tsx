@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, ScanFace } from "lucide-react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { CodeIcon, PhoneCall } from "@hugeicons/core-free-icons"
 import { verifySchema, type VerifyValues } from "@/lib/validation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -55,6 +57,7 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
           aria-invalid={!!errors.idConnection}
           disabled={submitting}
           className="font-mono uppercase tracking-wider"
+          leftIcon={<HugeiconsIcon icon={CodeIcon} size={18} />}
           {...register("idConnection", {
             onChange: (e) => {
               e.target.value = e.target.value.toUpperCase()
@@ -94,6 +97,7 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
           }
           disabled={submitting}
           ariaInvalid={!!errors.mobile}
+          leftIcon={<HugeiconsIcon icon={PhoneCall} size={18} />}
         />
         {errors.mobile ? (
           <p role="alert" className="text-xs text-destructive">

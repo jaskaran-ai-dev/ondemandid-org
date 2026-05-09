@@ -29,6 +29,7 @@ type PhoneInputProps = {
   id?: string
   ariaInvalid?: boolean
   ariaDescribedBy?: string
+  leftIcon?: React.ReactNode
 }
 
 export function PhoneInput({
@@ -40,6 +41,7 @@ export function PhoneInput({
   id,
   ariaInvalid,
   ariaDescribedBy,
+  leftIcon,
 }: PhoneInputProps) {
   const [open, setOpen] = React.useState(false)
 
@@ -120,6 +122,7 @@ export function PhoneInput({
         disabled={disabled}
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
+        leftIcon={leftIcon}
         onChange={(e) => {
           // Strip everything but digits.
           const digits = e.target.value.replace(/\D/g, "").slice(0, 14)

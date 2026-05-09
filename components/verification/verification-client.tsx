@@ -1,150 +1,121 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { VerificationForm } from "@/components/verification/verification-form"
 import {
   VerificationStatus,
   type VerificationState,
 } from "@/components/verification/verification-status"
+import { useVerify, useStatus } from "@/hooks/use-api"
 import type { VerifyValues } from "@/lib/validation"
 
-const POLL_INTERVAL_MS = 2000
 const MAX_ATTEMPTS = 150 // ~5 minutes
 
 export function VerificationClient() {
   const [state, setState] = useState<VerificationState>({ kind: "idle" })
   const [lastValues, setLastValues] = useState<VerifyValues | null>(null)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [requestId, setRequestId] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(1)
+  const [startedAt, setStartedAt] = useState<number | null>(null)
 
-  // Cleanup on unmount
+  const verifyMutation = useVerify()
+  const statusQuery = useStatus(requestId ?? "", state.kind === "pending")
+
+  // Handle status changes
   useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current)
-    }
-  }, [])
+    if (statusQuery.data && state.kind === "pending") {
+      const statusData = statusQuery.data
 
-  function clearPolling() {
-    if (pollRef.current) {
-      clearInterval(pollRef.current)
-      pollRef.current = null
-    }
-  }
-
-  async function startVerification(values: VerifyValues) {
-    setLastValues(values)
-    clearPolling()
-    setState({ kind: "submitting" })
-
-    try {
-      const res = await fetch("/api/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      })
-      const data = await res.json()
-
-      if (res.status === 404) {
-        setState({ kind: "not_found", ivaltStatusCode: 404 })
-        return
-      }
-      if (!res.ok || !data.ok) {
+      if (statusData.status === "authenticated") {
+        setRequestId(null)
         setState({
-          kind: "error",
-          message: data.error ?? "Failed to initiate verification.",
+          kind: "authenticated",
+          requestId: requestId!,
+          idConnection: lastValues?.idConnection ?? "",
+          durationMs: startedAt ? Date.now() - startedAt : 0,
         })
-        return
-      }
-
-      const startedAt = Date.now()
-      setState({
-        kind: "pending",
-        requestId: data.id,
-        idConnection: values.idConnection,
-        countryCode: values.countryCode,
-        mobile: values.mobile,
-        attempt: 1,
-        maxAttempts: MAX_ATTEMPTS,
-        ivaltStatusCode: data.ivaltStatusCode ?? 422,
-        startedAt,
-      })
-
-      // Start polling.
-      let attempt = 1
-      pollRef.current = setInterval(async () => {
-        attempt += 1
-        try {
-          const statusRes = await fetch(`/api/status/${data.id}`)
-          const statusData = await statusRes.json()
-
-          if (statusData.status === "authenticated") {
-            clearPolling()
-            setState({
-              kind: "authenticated",
-              requestId: data.id,
-              idConnection: values.idConnection,
-              durationMs: Date.now() - startedAt,
-            })
-            toast.success("Identity verified")
-            return
-          }
-          if (statusData.status === "failed") {
-            clearPolling()
+        toast.success("Identity verified")
+      } else if (statusData.status === "failed") {
+        setRequestId(null)
+        setState({
+          kind: "failed",
+          requestId: requestId!,
+          ivaltStatusCode: statusData.ivaltStatusCode ?? 403,
+        })
+        toast.error("Verification denied")
+      } else if (statusData.status === "not_found") {
+        setRequestId(null)
+        setState({
+          kind: "not_found",
+          ivaltStatusCode: statusData.ivaltStatusCode ?? 404,
+        })
+      } else {
+        // Still pending: bump attempt counter
+        setAttempt((prev) => {
+          const newAttempt = prev + 1
+          if (newAttempt >= MAX_ATTEMPTS) {
+            setRequestId(null)
             setState({
               kind: "failed",
-              requestId: data.id,
-              ivaltStatusCode: statusData.ivaltStatusCode ?? 403,
-            })
-            toast.error("Verification denied")
-            return
-          }
-          if (statusData.status === "not_found") {
-            clearPolling()
-            setState({
-              kind: "not_found",
-              ivaltStatusCode: statusData.ivaltStatusCode ?? 404,
-            })
-            return
-          }
-
-          // Still pending: bump attempt counter.
-          setState((prev) =>
-            prev.kind === "pending"
-              ? {
-                  ...prev,
-                  attempt,
-                  ivaltStatusCode: statusData.ivaltStatusCode ?? 422,
-                }
-              : prev,
-          )
-
-          if (attempt >= MAX_ATTEMPTS) {
-            clearPolling()
-            setState({
-              kind: "failed",
-              requestId: data.id,
+              requestId: requestId!,
               ivaltStatusCode: 403,
             })
             toast.error("Verification timed out")
+          } else {
+            setState((prev) =>
+              prev.kind === "pending"
+                ? {
+                    ...prev,
+                    attempt: newAttempt,
+                    ivaltStatusCode: statusData.ivaltStatusCode ?? 422,
+                  }
+                : prev,
+            )
           }
-        } catch {
-          clearPolling()
-          setState({
-            kind: "error",
-            message: "Lost connection while polling for status.",
-          })
-        }
-      }, POLL_INTERVAL_MS)
+          return newAttempt
+        })
+      }
+    }
+  }, [statusQuery.data, state.kind, requestId, lastValues, startedAt])
+
+  async function startVerification(values: VerifyValues) {
+    setLastValues(values)
+    setState({ kind: "submitting" })
+
+    try {
+      const result = await verifyMutation.mutateAsync(values)
+
+      if (result.ivaltStatusCode === 404) {
+        setState({ kind: "not_found", ivaltStatusCode: 404 })
+        return
+      }
+
+      if (result.ok && result.id) {
+        setRequestId(result.id)
+        setAttempt(1)
+        setStartedAt(Date.now())
+        setState({
+          kind: "pending",
+          requestId: result.id,
+          idConnection: values.idConnection,
+          countryCode: values.countryCode,
+          mobile: values.mobile,
+          attempt: 1,
+          maxAttempts: MAX_ATTEMPTS,
+          ivaltStatusCode: result.ivaltStatusCode ?? 422,
+          startedAt: Date.now(),
+        })
+      }
     } catch {
-      setState({
-        kind: "error",
-        message: "Network error. Please try again.",
-      })
+      // Error handling is done in the mutation
     }
   }
 
   function handleReset() {
-    clearPolling()
+    setRequestId(null)
+    setAttempt(1)
+    setStartedAt(null)
     setState({ kind: "idle" })
   }
 
@@ -164,7 +135,7 @@ export function VerificationClient() {
         {showForm ? (
           <VerificationForm
             onSubmit={startVerification}
-            submitting={state.kind === "submitting"}
+            submitting={verifyMutation.isPending}
           />
         ) : (
           <VerificationStatus
