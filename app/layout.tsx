@@ -43,7 +43,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${sourceSerif.variable} bg-background`}
+      className={`${inter.variable} ${sourceSerif.variable} ${bespokeStencil.variable} bg-background`}
     >
       <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground">
         <QueryProvider>

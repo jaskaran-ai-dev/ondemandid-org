@@ -18,7 +18,7 @@ export function Hero() {
       </div>
 
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-4 pb-16 pt-14 text-center md:px-6 md:pb-24 md:pt-20">
-        <div className="anim-fade-up inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
+        <div className="anim-fade-up inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium font-stencil text-muted-foreground shadow-sm">
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex size-2 rounded-full bg-primary" />
