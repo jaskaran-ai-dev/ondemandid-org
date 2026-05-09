@@ -1,0 +1,303 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Color system (4 colors):
+  - Primary: Deep teal (oklch(0.42 0.09 200)) — trust / security brand
+  - Neutral light: oklch(0.985 0 0) (white-ish background)
+  - Neutral mid:   oklch(0.96 0.005 200) (subtle muted surface)
+  - Neutral dark:  oklch(0.18 0.02 240) (foreground)
+  - Accent:        oklch(0.78 0.14 75)  (warm amber for highlights)
+*/
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.02 240);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 240);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 240);
+
+  --primary: oklch(0.42 0.09 200);
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.96 0.005 200);
+  --secondary-foreground: oklch(0.18 0.02 240);
+
+  --muted: oklch(0.96 0.005 200);
+  --muted-foreground: oklch(0.45 0.02 240);
+
+  --accent: oklch(0.78 0.14 75);
+  --accent-foreground: oklch(0.18 0.02 240);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.9 0.01 220);
+  --input: oklch(0.9 0.01 220);
+  --ring: oklch(0.42 0.09 200);
+
+  --chart-1: oklch(0.42 0.09 200);
+  --chart-2: oklch(0.6 0.12 200);
+  --chart-3: oklch(0.78 0.14 75);
+  --chart-4: oklch(0.45 0.02 240);
+  --chart-5: oklch(0.18 0.02 240);
+
+  --radius: 0.625rem;
+
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.18 0.02 240);
+  --sidebar-primary: oklch(0.42 0.09 200);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.96 0.005 200);
+  --sidebar-accent-foreground: oklch(0.18 0.02 240);
+  --sidebar-border: oklch(0.9 0.01 220);
+  --sidebar-ring: oklch(0.42 0.09 200);
+}
+
+.dark {
+  --background: oklch(0.14 0.02 240);
+  --foreground: oklch(0.985 0 0);
+
+  --card: oklch(0.18 0.02 240);
+  --card-foreground: oklch(0.985 0 0);
+
+  --popover: oklch(0.18 0.02 240);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: oklch(0.62 0.12 200);
+  --primary-foreground: oklch(0.14 0.02 240);
+
+  --secondary: oklch(0.24 0.02 240);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --muted: oklch(0.24 0.02 240);
+  --muted-foreground: oklch(0.7 0.02 240);
+
+  --accent: oklch(0.78 0.14 75);
+  --accent-foreground: oklch(0.14 0.02 240);
+
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.28 0.02 240);
+  --input: oklch(0.28 0.02 240);
+  --ring: oklch(0.62 0.12 200);
+
+  --chart-1: oklch(0.62 0.12 200);
+  --chart-2: oklch(0.5 0.1 200);
+  --chart-3: oklch(0.78 0.14 75);
+  --chart-4: oklch(0.7 0.02 240);
+  --chart-5: oklch(0.985 0 0);
+
+  --sidebar: oklch(0.18 0.02 240);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.62 0.12 200);
+  --sidebar-primary-foreground: oklch(0.14 0.02 240);
+  --sidebar-accent: oklch(0.24 0.02 240);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.28 0.02 240);
+  --sidebar-ring: oklch(0.62 0.12 200);
+}
+
+@theme inline {
+  --font-sans: var(--font-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), 'Source Serif 4', ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .font-serif {
+    font-family: var(--font-serif);
+    font-feature-settings: "ss01";
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Lightweight, GPU-friendly animation primitives (no JS animation library).
+   - `.anim-*` classes run once on mount via CSS @keyframes (entrance).
+   - `.reveal` is a transition-based pattern toggled by IntersectionObserver:
+     starts hidden, becomes visible when `.is-visible` is added.
+   - All animations honor `prefers-reduced-motion`.
+--------------------------------------------------------------------------- */
+
+@keyframes anim-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes anim-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes anim-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes anim-blob-drift {
+  0%,
+  100% {
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-50%, -8px, 0) scale(1.04);
+  }
+}
+
+@keyframes anim-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@layer utilities {
+  /* Entrance animations — applied immediately on mount, no JS needed.
+     Uses opacity + transform only to stay on the compositor thread. */
+  .anim-fade-up {
+    animation: anim-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-fade-in {
+    animation: anim-fade-in 700ms ease-out both;
+  }
+  .anim-scale-in {
+    animation: anim-scale-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-blob {
+    animation: anim-blob-drift 14s ease-in-out infinite;
+    will-change: transform;
+  }
+  .anim-shimmer {
+    background-size: 200% 100%;
+    animation: anim-shimmer 2.4s linear infinite;
+  }
+
+  /* Stagger helpers — apply on a parent or sibling row. */
+  .anim-delay-0 {
+    animation-delay: 0ms;
+  }
+  .anim-delay-75 {
+    animation-delay: 75ms;
+  }
+  .anim-delay-150 {
+    animation-delay: 150ms;
+  }
+  .anim-delay-200 {
+    animation-delay: 200ms;
+  }
+  .anim-delay-300 {
+    animation-delay: 300ms;
+  }
+  .anim-delay-450 {
+    animation-delay: 450ms;
+  }
+  .anim-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  /* Scroll-reveal pattern — toggled by IntersectionObserver. */
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal-left {
+    transform: translate3d(-16px, 0, 0);
+  }
+  .reveal-right {
+    transform: translate3d(16px, 0, 0);
+  }
+  .reveal-scale {
+    transform: scale(0.97);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Respect user preference: disable all decorative motion. */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-scale-in,
+  .anim-blob,
+  .anim-shimmer {
+    animation: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
