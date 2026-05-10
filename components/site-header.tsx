@@ -2,9 +2,41 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { useTheme } from "@/components/theme-provider-custom"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+
+function SmoothScrollLink({
+  href,
+  children,
+  className,
+}: {
+  href: string
+  children: React.ReactNode
+  className?: string
+}) {
+  const pathname = usePathname()
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (href.startsWith("/#") && pathname === "/") {
+      e.preventDefault()
+      const targetId = href.replace("/#", "")
+      const element = document.getElementById(targetId)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" })
+        // Update URL without page reload
+        window.history.pushState(null, "", href)
+      }
+    }
+  }
+
+  return (
+    <Link href={href} onClick={handleClick} className={className}>
+      {children}
+    </Link>
+  )
+}
 
 export function SiteHeader() {
   const { theme, resolvedTheme } = useTheme()
@@ -29,24 +61,24 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm md:flex" aria-label="Primary">
-          <Link
+          <SmoothScrollLink
             href="/#features"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Features
-          </Link>
-          <Link
+          </SmoothScrollLink>
+          <SmoothScrollLink
             href="/#how-it-works"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             How it works
-          </Link>
-          <Link
+          </SmoothScrollLink>
+          <SmoothScrollLink
             href="/#security"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Security
-          </Link>
+          </SmoothScrollLink>
           <Link
             href="/ondemand-id"
             className="text-muted-foreground transition-colors hover:text-foreground"
