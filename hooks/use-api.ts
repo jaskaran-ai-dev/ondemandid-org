@@ -31,12 +31,12 @@ export function useSignup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       })
-      
+
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || "Failed to submit signup")
+        const error = await res.json().catch(() => ({}))
+        throw new Error(error.error || `Failed to submit signup (${res.status})`)
       }
-      
+
       return res.json()
     },
     onSuccess: (data) => {

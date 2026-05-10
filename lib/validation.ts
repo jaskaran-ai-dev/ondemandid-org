@@ -29,6 +29,10 @@ export const signupSchema = z.object({
     .min(1, "Must onboard at least 1 user")
     .max(100, "Maximum 100 users for the trial"),
   notes: z.string().max(2000).optional().or(z.literal("")),
+  turnstileToken: z
+    .string()
+    .min(1, "Please complete the security verification")
+    .optional(),
 })
 
 export type SignupValues = z.infer<typeof signupSchema>

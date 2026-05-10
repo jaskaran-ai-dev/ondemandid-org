@@ -2,15 +2,17 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { Loader2, ShieldCheck } from "lucide-react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { BuildingIcon, UserIcon, Mail01Icon, PhoneCall, User02Icon, File01Icon } from "@hugeicons/core-free-icons"
+import { BuildingIcon, UserIcon, Mail01Icon, PhoneCall, User02Icon } from "@hugeicons/core-free-icons"
 import { signupSchema, type SignupValues } from "@/lib/validation"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { PhoneInput } from "@/components/ui/phone-input"
+import { Turnstile } from "@/components/ui/turnstile"
+import { useState } from "react"
 
 type Props = {
   onSubmit: (values: SignupValues) => Promise<void>
@@ -18,6 +20,9 @@ type Props = {
 }
 
 export function SignupForm({ onSubmit, submitting }: Props) {
+  const [turnstileToken, setTurnstileToken] = useState<string>("")
+  const [turnstileError, setTurnstileError] = useState<string>("")
+
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -28,6 +33,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
       mobile: "",
       initialUsers: 10,
       notes: "",
+      turnstileToken: "",
     },
     mode: "onTouched",
   })
@@ -43,9 +49,20 @@ export function SignupForm({ onSubmit, submitting }: Props) {
   const countryCode = watch("countryCode")
   const mobile = watch("mobile")
 
+  const hasTurnstileKey = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+  const handleFormSubmit = handleSubmit(async (values) => {
+    if (hasTurnstileKey && !turnstileToken) {
+      setTurnstileError("Please complete the security verification above.")
+      return
+    }
+    setTurnstileError("")
+    await onSubmit({ ...values, turnstileToken })
+  })
+
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleFormSubmit}
       className="flex flex-col gap-6"
       noValidate
     >
@@ -163,12 +180,38 @@ export function SignupForm({ onSubmit, submitting }: Props) {
         />
       </Field>
 
+      {hasTurnstileKey && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="size-3.5" aria-hidden />
+            <span>Security verification required</span>
+          </div>
+          <Turnstile
+            onVerify={(token) => {
+              setTurnstileToken(token)
+              setTurnstileError("")
+            }}
+            onError={() => setTurnstileError("Security verification failed. Please try again.")}
+            onExpire={() => setTurnstileToken("")}
+          />
+          {turnstileError && (
+            <p className="text-xs text-destructive" role="alert">
+              {turnstileError}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
           By submitting, you agree to be contacted by an iVALT representative
           about provisioning your trial.
         </p>
-        <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          disabled={submitting || (hasTurnstileKey && !turnstileToken)}
+          className="w-full sm:w-auto"
+        >
           {submitting ? (
             <>
               <Loader2 className="mr-1 size-4 animate-spin" aria-hidden />
