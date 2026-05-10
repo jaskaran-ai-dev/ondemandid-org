@@ -2,6 +2,11 @@ import { NextResponse } from "next/server"
 import { signupSchema } from "@/lib/validation"
 import { db, schema } from "@/lib/db"
 import { sendAdminSignupNotification, sendCustomerConfirmation } from "@/lib/email"
+import { checkRateLimit, verifyTurnstileToken, stripHtml } from "@/lib/security"
+
+const MAX_BODY_SIZE = 256_000 // 256 KB
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 60_000 // 1 minute
 
 // Demo mode handler
 async function handleDemoMode(body: any) {
@@ -62,6 +67,35 @@ async function handleProductionMode(data: any) {
 }
 
 export async function POST(request: Request) {
+  // Body size check
+  const contentLength = request.headers.get("content-length")
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+    return NextResponse.json(
+      { error: "Request body too large" },
+      { status: 413 },
+    )
+  }
+
+  // Rate limiting by IP
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+
+  const rateLimit = checkRateLimit(`signup:${ip}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in a minute." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Remaining": String(rateLimit.remaining),
+          "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetAt / 1000)),
+        },
+      },
+    )
+  }
+
   try {
     const body = await request.json()
     const parsed = signupSchema.safeParse(body)
@@ -77,11 +111,35 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data
+
+    // Verify Turnstile CAPTCHA token
+    if (data.turnstileToken) {
+      const turnstileValid = await verifyTurnstileToken(data.turnstileToken)
+      if (!turnstileValid) {
+        return NextResponse.json(
+          { error: "Security verification failed. Please try again." },
+          { status: 400 },
+        )
+      }
+    } else if (process.env.TURNSTILE_SECRET_KEY) {
+      // Secret key is configured but token is missing
+      return NextResponse.json(
+        { error: "Security verification required." },
+        { status: 400 },
+      )
+    }
+
+    // Sanitize notes field to strip HTML tags (XSS prevention for email contexts)
+    const sanitizedData = {
+      ...data,
+      notes: data.notes ? stripHtml(data.notes) : null,
+    }
+
     const isDemoMode = process.env.DEMO_MODE === "true"
 
-    const result = isDemoMode 
+    const result = isDemoMode
       ? await handleDemoMode(body)
-      : await handleProductionMode(data)
+      : await handleProductionMode(sanitizedData)
 
     return NextResponse.json(result, { status: 201 })
   } catch (error) {
