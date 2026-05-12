@@ -123,14 +123,17 @@ Deferred to future release. Tracked but not in current roadmap.
 | ADMIN-04 | Phase 7 | Pending |
 | ADMIN-05 | Phase 7 | Pending |
 | SEC-04 | Phase 7 | Pending |
-| API-01 | Phase 7 | Pending |
-| API-02 | Phase 7 | Pending |
+| API-01 | Phase 8 | Pending |
+| API-02 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 27 total
 - Mapped to phases: 27
 - Unmapped: 0 ✓
 
+**Notes:**
+- API-03 (Webhook system) is marked "optional for v1" — not included in current roadmap. Add to v2 when push-based verification result notifications are needed.
+
 ---
 *Requirements defined: 2026-05-12*
-*Last updated: 2026-05-12 after initial definition*
+*Last updated: 2026-05-12 — updated phase mappings to 8-phase roadmap*
