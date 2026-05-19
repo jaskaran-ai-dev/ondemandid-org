@@ -1,6 +1,6 @@
 // Email transport factory - AWS SES with SMTP fallback
 
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
+import { SESClient } from "@aws-sdk/client-ses"
 import nodemailer from "nodemailer"
 
 const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || "ses"
@@ -17,9 +17,10 @@ async function createSesTransport(): Promise<nodemailer.Transporter> {
     },
   })
 
+  // Using SESv2 transport configuration for nodemailer
   return nodemailer.createTransport({
-    SES: { ses: sesClient, aws: { SES: sesClient } },
-  })
+    SESv2: { client: sesClient },
+  } as any)
 }
 
 // SMTP Transport (fallback)
