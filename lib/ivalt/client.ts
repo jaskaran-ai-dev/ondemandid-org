@@ -8,6 +8,7 @@ import type {
 
 const IVALT_API_BASE_URL = process.env.IVALT_API_BASE_URL || "https://api.ivalt.com"
 const IVALT_API_KEY = process.env.IVALT_API_KEY
+const DEBUG_MODE = process.env.DEBUG_MODE === "true" || process.env.NODE_ENV === "development"
 
 if (!IVALT_API_KEY) {
   console.warn("IVALT_API_KEY not set - iVALT API calls will fail")
@@ -20,7 +21,7 @@ async function ivaltRequest<T>(
   const url = `${IVALT_API_BASE_URL}${endpoint}`
   
   // Log request in development mode
-  if (process.env.NODE_ENV === "development") {
+  if (DEBUG_MODE) {
     console.log("[iVALT Request]", {
       url,
       method: "POST",
@@ -42,7 +43,7 @@ async function ivaltRequest<T>(
     responseData = await response.json()
   } catch {
     const errorText = await response.text()
-    if (process.env.NODE_ENV === "development") {
+    if (DEBUG_MODE) {
       console.log("[iVALT Response]", {
         url,
         status: response.status,
@@ -56,7 +57,7 @@ async function ivaltRequest<T>(
   }
 
   // Log response in development mode
-  if (process.env.NODE_ENV === "development") {
+  if (DEBUG_MODE) {
     console.log("[iVALT Response]", {
       url,
       status: response.status,
