@@ -11,7 +11,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border/60 bg-secondary/40">
-      <div className="mx-auto flex items-center justify-center w-full max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between md:px-6">
+      <div className="mx-auto flex justify-center w-full max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
         <div className="flex flex-col gap-3 max-w-sm">
           <Link href="/" className="flex items-center gap-3 font-semibold">
             <div className="relative size-24">
@@ -33,7 +33,7 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 justify-items-center">
+        <div className="grid grid-cols-2 gap-8 md:gap-28 sm:grid-cols-2 ">
           <div>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-foreground">
               Product
