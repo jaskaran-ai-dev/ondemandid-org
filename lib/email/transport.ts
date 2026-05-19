@@ -7,6 +7,21 @@ const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || "ses"
 
 let transporter: nodemailer.Transporter | null = null
 
+// Check if email is configured with valid credentials
+export function isEmailConfigured(): boolean {
+  if (EMAIL_PROVIDER === "ses") {
+    const keyId = process.env.AWS_ACCESS_KEY_ID || ""
+    const secretKey = process.env.AWS_SECRET_ACCESS_KEY || ""
+    const from = process.env.EMAIL_FROM || ""
+    // Reject placeholder values
+    const isValidKey = keyId && !keyId.includes("your_") && keyId.length > 10
+    const isValidSecret = secretKey && !secretKey.includes("your_") && secretKey.length > 10
+    return isValidKey && isValidSecret && !!from
+  }
+  const hasSmtp = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.EMAIL_FROM
+  return !!(hasSmtp && EMAIL_PROVIDER === "smtp")
+}
+
 // AWS SES Transport
 async function createSesTransport(): Promise<nodemailer.Transporter> {
   const sesClient = new SESClient({
@@ -42,6 +57,11 @@ export async function getTransport(): Promise<nodemailer.Transporter> {
     return transporter
   }
 
+  // Skip transport creation if email is not configured
+  if (!isEmailConfigured()) {
+    throw new Error("Email not configured - set AWS or SMTP credentials")
+  }
+
   try {
     if (EMAIL_PROVIDER === "ses") {
       transporter = await createSesTransport()
@@ -71,6 +91,12 @@ export async function sendEmail(options: {
   html: string
   text?: string
 }): Promise<void> {
+  // Skip if email is not configured
+  if (!isEmailConfigured()) {
+    console.log("[Email] Skipped - email credentials not configured")
+    return
+  }
+
   const EMAIL_FROM = process.env.EMAIL_FROM || "noreply@example.com"
 
   try {
