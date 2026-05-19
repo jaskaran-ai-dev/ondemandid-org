@@ -1,12 +1,9 @@
 import type { Config } from "drizzle-kit"
 
-const dbType = process.env.DB_TYPE || "sqlite"
-
+// Use PostgreSQL for production (Neon)
 export default {
-  schema: dbType === "neon" ? "./lib/db/schema.pg.ts" : "./lib/db/schema.sqlite.ts",
+  schema: "./lib/db/schema.pg.ts",
   out: "./drizzle",
-  dialect: dbType === "neon" ? "postgresql" : "sqlite",
-  dbCredentials: dbType === "neon" 
-    ? { url: process.env.DATABASE_URL! }
-    : { url: process.env.SQLITE_DB_PATH || "./local.db" },
+  dialect: "postgresql",
+  dbCredentials: { url: process.env.DATABASE_URL! },
 } satisfies Config
