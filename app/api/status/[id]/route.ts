@@ -98,8 +98,22 @@ async function handleProductionMode(id: string) {
         response: authResult,
       })
       
+      // Parse iVALT response - handle both old and new response formats
+      let statusCode: number;
+      let isAuthenticated: boolean;
+      
+      if (authResult.data) {
+        // New response format: { data: { status: true, ... }, error: null }
+        isAuthenticated = authResult.data.status === true;
+        statusCode = isAuthenticated ? 200 : 422;
+      } else {
+        // Old response format: { statusCode: 200, ... }
+        statusCode = authResult.statusCode;
+        isAuthenticated = statusCode === 200;
+      }
+      
       // Map iVALT status code to internal status
-      const { status, ivaltStatusCode } = mapIvaltStatus(authResult.statusCode)
+      const { status, ivaltStatusCode } = mapIvaltStatus(statusCode)
 
       // Update database with latest status
       const updateData: any = {
@@ -108,7 +122,7 @@ async function handleProductionMode(id: string) {
         ivaltResponse: process.env.DB_TYPE === "neon" ? authResult : JSON.stringify(authResult),
       }
 
-      // If terminal, set completedAt
+      // If terminal, set completedAt (handle both SQLite number and PostgreSQL Date)
       if (status === "authenticated" || status === "failed" || status === "not_found") {
         updateData.completedAt = new Date().toISOString()
       }
