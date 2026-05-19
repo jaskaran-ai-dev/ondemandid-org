@@ -118,12 +118,13 @@ async function handleProductionMode(data: any, request: Request) {
       countryCode,
       mobile,
     })
-    ivaltStatusCode = 422 // pending
+    ivaltStatusCode = 202 // iVALT returns 202 on success
     ivaltResponse = authRequest
-  } catch (error) {
+  } catch (error: any) {
     console.error("iVALT API error:", error)
-    // Continue anyway - don't block the flow
-    ivaltStatusCode = null
+    // Extract status code from error message if present
+    const match = error?.message?.match?.(/iVALT API error \((\d+)\)/)
+    ivaltStatusCode = match ? parseInt(match[1], 10) : null
     ivaltResponse = { error: String(error) }
   }
 
