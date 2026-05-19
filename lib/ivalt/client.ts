@@ -19,6 +19,15 @@ async function ivaltRequest<T>(
 ): Promise<T> {
   const url = `${IVALT_API_BASE_URL}${endpoint}`
   
+  // Log request in development mode
+  if (process.env.NODE_ENV === "development") {
+    console.log("[iVALT Request]", {
+      url,
+      method: "POST",
+      body: body ?? null,
+    })
+  }
+  
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -28,14 +37,34 @@ async function ivaltRequest<T>(
     body: body ? JSON.stringify(body) : undefined,
   })
 
-  if (!response.ok) {
+  let responseData: T
+  try {
+    responseData = await response.json()
+  } catch {
     const errorText = await response.text()
+    if (process.env.NODE_ENV === "development") {
+      console.log("[iVALT Response]", {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+      })
+    }
     throw new Error(
       `iVALT API error (${response.status}): ${errorText || response.statusText}`,
     )
   }
 
-  return response.json()
+  // Log response in development mode
+  if (process.env.NODE_ENV === "development") {
+    console.log("[iVALT Response]", {
+      url,
+      status: response.status,
+      body: responseData,
+    })
+  }
+
+  return responseData
 }
 
 /**

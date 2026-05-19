@@ -98,6 +98,16 @@ async function handleProductionMode(data: any, request: Request) {
 
   const requestId = requestRecord[0].id
 
+  // Log verification request
+  console.log("[Verify API] Production mode request:", {
+    requestId,
+    idConnection,
+    countryCode,
+    mobile,
+    ip,
+    userAgent,
+  })
+
   // Call iVALT API to trigger push notification
   let ivaltResponse: any = null
   let ivaltStatusCode: number | null = null

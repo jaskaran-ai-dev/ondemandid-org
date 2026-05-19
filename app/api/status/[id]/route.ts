@@ -62,6 +62,13 @@ async function handleProductionMode(id: string) {
 
   const request = requests[0]
 
+  // Log status check
+  console.log("[Status API] Production mode check:", {
+    requestId: id,
+    currentStatus: request.status,
+    ivaltStatusCode: request.ivaltStatusCode,
+  })
+
   // If already terminal (authenticated, failed, not_found, error), return as-is
   if (
     request.status === "authenticated" ||
@@ -81,6 +88,12 @@ async function handleProductionMode(id: string) {
   if (request.status === "pending" || request.status === "initiated") {
     try {
       const authResult = await getAuthResult(id)
+      
+      // Log iVALT response
+      console.log("[Status API] iVALT response:", {
+        requestId: id,
+        response: authResult,
+      })
       
       // Map iVALT status code to internal status
       const { status, ivaltStatusCode } = mapIvaltStatus(authResult.statusCode)
