@@ -36,7 +36,7 @@ async function handleDemoMode(id: string) {
       id: r.id,
       status: r.status,
       ivaltStatusCode: r.ivaltStatusCode,
-      completedAt: r.completedAt,
+      completedAt: new Date(r.completedAt).toISOString(),
     }
   }
 
@@ -44,6 +44,7 @@ async function handleDemoMode(id: string) {
     id: r.id,
     status: "pending",
     ivaltStatusCode: 422,
+    completedAt: undefined,
   }
 }
 
@@ -76,11 +77,13 @@ async function handleProductionMode(id: string) {
     request.status === "not_found" ||
     request.status === "error"
   ) {
+    // Ensure completedAt is a string
+    const completedAt = request.completedAt;
     return {
       id: request.id,
       status: request.status,
       ivaltStatusCode: request.ivaltStatusCode,
-      completedAt: request.completedAt,
+      completedAt: completedAt ? new Date(completedAt).toISOString() : undefined,
     }
   }
 
@@ -122,9 +125,14 @@ async function handleProductionMode(id: string) {
         ivaltResponse: process.env.DB_TYPE === "neon" ? authResult : JSON.stringify(authResult),
       }
 
-      // If terminal, set completedAt (handle both SQLite number and PostgreSQL Date)
+      // If terminal, set completedAt (always use ISO string format)
       if (status === "authenticated" || status === "failed" || status === "not_found") {
         updateData.completedAt = new Date().toISOString()
+      }
+
+      // For SQLite, convert completedAt to string if it's a number
+      if (process.env.DB_TYPE === "sqlite" && request.completedAt && typeof request.completedAt !== "string") {
+        updateData.completedAt = new Date(request.completedAt).toISOString()
       }
 
       await db
@@ -154,6 +162,7 @@ async function handleProductionMode(id: string) {
     id: request.id,
     status: request.status,
     ivaltStatusCode: request.ivaltStatusCode || 422,
+    completedAt: undefined,
   }
 }
 

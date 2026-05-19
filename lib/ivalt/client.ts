@@ -140,6 +140,7 @@ export function mapIvaltStatus(statusCode: number): {
     case 404:
       return { status: "not_found", ivaltStatusCode: 404 };
     case 422:
+    case 400: // 400: Bad request - may indicate pending state
       return { status: "pending", ivaltStatusCode: 422 };
     case 403:
       return { status: "failed", ivaltStatusCode: 403 };
