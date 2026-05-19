@@ -64,8 +64,13 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
   }
 
   if (state.kind === "authenticated") {
-    const mobile = state.details?.mobile as string | undefined
-    const idConnection = state.details?.id_connection as string | undefined
+    const details = state.details
+    const name = details?.name as string | undefined
+    const email = details?.email as string | undefined
+    const mobile = details?.mobile as string | undefined
+    const countryCode = details?.country_code as string | undefined
+    const address = details?.address as string | undefined
+    const idConnection = details?.id_connection as string | undefined
 
     return (
       <Frame
@@ -76,14 +81,22 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
           state.durationMs / 1000
         ).toFixed(1)}s.`}
       >
+        {name && <DetailsRow label="Name" value={name} />}
+        {email && <DetailsRow label="Email" value={email} />}
         {mobile && (
-          <DetailsRow label="Verified user" value={mobile} mono />
+          <DetailsRow
+            label="Mobile"
+            value={`${countryCode || ""} ${mobile}`.trim()}
+            mono
+          />
         )}
+        {address && <DetailsRow label="Location" value={address} />}
+        <div className="my-2 border-t border-border/60" />
+        <DetailsRow label="Request ID" value={state.requestId} mono />
+        <DetailsRow label="IDCONNECTION" value={state.idConnection} mono />
         {idConnection && (
           <DetailsRow label="ID Connection" value={idConnection} mono />
         )}
-        <DetailsRow label="Request ID" value={state.requestId} mono />
-        <DetailsRow label="IDCONNECTION" value={state.idConnection} mono />
         <DetailsRow label="iVALT status" value="200 · authenticated" mono />
         <Actions onReset={onReset} primaryLabel="Verify another user" />
       </Frame>
