@@ -105,12 +105,10 @@ export async function triggerAuthRequest(params: {
  * POST /biometric-auth-result
  */
 export async function getAuthResult(params: {
-  requestId: string;
   countryCode: string;
   mobile: string;
 }): Promise<IvaltAuthResultResponse> {
   return ivaltRequest<IvaltAuthResultResponse>("/biometric-auth-result", {
-    request_id: params.requestId,
     mobile: `${params.countryCode}${params.mobile}`,
   });
 }
@@ -120,14 +118,12 @@ export async function getAuthResult(params: {
  * POST /biometric-geo-fence-auth-results
  */
 export async function getGeoFenceResult(params: {
-  requestId: string;
   countryCode: string;
   mobile: string;
 }): Promise<IvaltGeoFenceResponse> {
   return ivaltRequest<IvaltGeoFenceResponse>(
     "/biometric-geo-fence-auth-results",
     {
-      request_id: params.requestId,
       mobile: `${params.countryCode}${params.mobile}`,
     },
   );

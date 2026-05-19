@@ -88,7 +88,6 @@ async function handleProductionMode(id: string) {
   if (request.status === "pending" || request.status === "initiated") {
     try {
       const authResult = await getAuthResult({
-        requestId: id,
         countryCode: request.countryCode,
         mobile: request.mobile,
       })
