@@ -66,9 +66,10 @@ async function ivaltRequest<T>(
         body: responseData,
       });
     }
-    const errorMsg = (responseData as any)?.error?.detail || 
-                     (responseData as any)?.message || 
-                     JSON.stringify(responseData);
+    const errorMsg =
+      (responseData as any)?.error?.detail ||
+      (responseData as any)?.message ||
+      JSON.stringify(responseData);
     throw new Error(`iVALT API error (${response.status}): ${errorMsg}`);
   }
 
@@ -118,13 +119,16 @@ export async function getAuthResult(params: {
  * Geo-fence + time window validation (optional)
  * POST /biometric-geo-fence-auth-results
  */
-export async function getGeoFenceResult(
-  requestId: string,
-): Promise<IvaltGeoFenceResponse> {
+export async function getGeoFenceResult(params: {
+  requestId: string;
+  countryCode: string;
+  mobile: string;
+}): Promise<IvaltGeoFenceResponse> {
   return ivaltRequest<IvaltGeoFenceResponse>(
     "/biometric-geo-fence-auth-results",
     {
-      request_id: requestId,
+      request_id: params.requestId,
+      mobile: `${params.countryCode}${params.mobile}`,
     },
   );
 }
