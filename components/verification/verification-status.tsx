@@ -33,6 +33,7 @@ export type VerificationState =
       requestId: string
       idConnection: string
       durationMs: number
+      details?: Record<string, unknown> | null
     }
   | { kind: "failed"; requestId: string; ivaltStatusCode: number }
   | { kind: "not_found"; ivaltStatusCode: number }
@@ -63,6 +64,9 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
   }
 
   if (state.kind === "authenticated") {
+    const mobile = state.details?.mobile as string | undefined
+    const idConnection = state.details?.id_connection as string | undefined
+
     return (
       <Frame
         tone="success"
@@ -72,6 +76,12 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
           state.durationMs / 1000
         ).toFixed(1)}s.`}
       >
+        {mobile && (
+          <DetailsRow label="Verified user" value={mobile} mono />
+        )}
+        {idConnection && (
+          <DetailsRow label="ID Connection" value={idConnection} mono />
+        )}
         <DetailsRow label="Request ID" value={state.requestId} mono />
         <DetailsRow label="IDCONNECTION" value={state.idConnection} mono />
         <DetailsRow label="iVALT status" value="200 · authenticated" mono />

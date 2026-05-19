@@ -140,11 +140,15 @@ async function handleProductionMode(id: string) {
         ? updateData.completedAt.toISOString()
         : updateData.completedAt
 
+      // Extract user details from iVALT response for authenticated requests
+      const details = authResult.data?.details || null
+
       const result = {
         id: request.id,
         status,
         ivaltStatusCode,
         completedAt,
+        details,
       }
 
       console.log("[Status API] Returning result:", result)

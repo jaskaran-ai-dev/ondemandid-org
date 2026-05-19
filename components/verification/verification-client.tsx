@@ -34,6 +34,7 @@ export function VerificationClient() {
           requestId: requestId!,
           idConnection: lastValues?.idConnection ?? "",
           durationMs: startedAt ? Date.now() - startedAt : 0,
+          details: statusData.details,
         })
         toast.success("Identity verified")
       } else if (statusData.status === "failed") {

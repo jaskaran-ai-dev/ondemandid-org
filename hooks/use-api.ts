@@ -20,6 +20,8 @@ interface VerifyResponse {
 interface StatusResponse {
   status: "initiated" | "pending" | "authenticated" | "failed" | "not_found"
   ivaltStatusCode?: number
+  completedAt?: string
+  details?: Record<string, unknown> | null
 }
 
 // Signup mutation
