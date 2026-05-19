@@ -77,7 +77,7 @@ export function VerificationClient() {
         })
       }
     }
-  }, [statusQuery.data, state.kind, requestId, lastValues, startedAt])
+  }, [statusQuery.data?.status, state.kind, requestId, lastValues, startedAt])
 
   async function startVerification(values: VerifyValues) {
     setLastValues(values)

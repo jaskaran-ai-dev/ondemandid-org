@@ -111,7 +111,7 @@ async function handleProductionMode(id: string) {
         statusCode = isAuthenticated ? 200 : 422;
       } else {
         // Old response format: { statusCode: 200, ... }
-        statusCode = authResult.statusCode;
+        statusCode = authResult.statusCode ?? 422;
         isAuthenticated = statusCode === 200;
       }
       
@@ -125,14 +125,10 @@ async function handleProductionMode(id: string) {
         ivaltResponse: process.env.DB_TYPE === "neon" ? authResult : JSON.stringify(authResult),
       }
 
-      // If terminal, set completedAt (always use ISO string format)
+      // If terminal, set completedAt
       if (status === "authenticated" || status === "failed" || status === "not_found") {
-        updateData.completedAt = new Date().toISOString()
-      }
-
-      // For SQLite, convert completedAt to string if it's a number
-      if (process.env.DB_TYPE === "sqlite" && request.completedAt && typeof request.completedAt !== "string") {
-        updateData.completedAt = new Date(request.completedAt).toISOString()
+        const isSqlite = process.env.DB_TYPE === "sqlite"
+        updateData.completedAt = isSqlite ? new Date().toISOString() : new Date()
       }
 
       await db
@@ -140,12 +136,20 @@ async function handleProductionMode(id: string) {
         .set(updateData)
         .where(eq(schema.ondemandRequests.id, id))
 
-      return {
+      const completedAt = updateData.completedAt instanceof Date
+        ? updateData.completedAt.toISOString()
+        : updateData.completedAt
+
+      const result = {
         id: request.id,
         status,
         ivaltStatusCode,
-        completedAt: updateData.completedAt,
+        completedAt,
       }
+
+      console.log("[Status API] Returning result:", result)
+
+      return result
     } catch (error) {
       console.error("iVALT status API error:", error)
       // Return current pending status on error
