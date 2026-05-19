@@ -2,7 +2,7 @@
 
 import { readFileSync } from "fs"
 import { join } from "path"
-import { sendEmail, isEmailConfigured } from "./transport"
+import { sendEmail } from "./transport"
 
 interface TemplateVariables {
   [key: string]: string | number
@@ -18,6 +18,15 @@ function renderTemplate(templatePath: string, variables: TemplateVariables): str
   }
   
   return rendered
+}
+
+// Check if email is configured
+function isEmailConfigured(): boolean {
+  const hasSes = process.env.EMAIL_PROVIDER === "ses" && 
+    process.env.AWS_ACCESS_KEY_ID && 
+    process.env.AWS_SECRET_ACCESS_KEY
+  const hasSmtp = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+  return hasSes || hasSmtp
 }
 
 // Admin Signup Notification

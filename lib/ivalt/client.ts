@@ -6,7 +6,7 @@ import type {
   IvaltGeoFenceResponse,
 } from "./types"
 
-const IVALT_API_BASE_URL = (process.env.IVALT_API_BASE_URL || "https://api.ivalt.com").replace(/\/$/, "")
+const IVALT_API_BASE_URL = process.env.IVALT_API_BASE_URL || "https://api.ivalt.com"
 const IVALT_API_KEY = process.env.IVALT_API_KEY
 const DEBUG_MODE = process.env.DEBUG_MODE === "true" || process.env.NODE_ENV === "development"
 
@@ -56,12 +56,11 @@ async function ivaltRequest<T>(
     )
   }
 
-  // Log error responses in development mode
-  if (DEBUG_MODE && !response.ok) {
-    console.log("[iVALT Error]", {
+  // Log response in development mode
+  if (DEBUG_MODE) {
+    console.log("[iVALT Response]", {
       url,
       status: response.status,
-      statusText: response.statusText,
       body: responseData,
     })
   }
