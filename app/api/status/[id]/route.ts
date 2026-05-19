@@ -87,7 +87,11 @@ async function handleProductionMode(id: string) {
   // If pending or initiated, query iVALT API for latest status
   if (request.status === "pending" || request.status === "initiated") {
     try {
-      const authResult = await getAuthResult(id)
+      const authResult = await getAuthResult({
+        requestId: id,
+        countryCode: request.countryCode,
+        mobile: request.mobile,
+      })
       
       // Log iVALT response
       console.log("[Status API] iVALT response:", {

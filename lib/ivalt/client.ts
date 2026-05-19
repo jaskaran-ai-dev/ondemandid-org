@@ -103,11 +103,14 @@ export async function triggerAuthRequest(params: {
  * Poll for authentication result
  * POST /biometric-auth-result
  */
-export async function getAuthResult(
-  requestId: string,
-): Promise<IvaltAuthResultResponse> {
+export async function getAuthResult(params: {
+  requestId: string;
+  countryCode: string;
+  mobile: string;
+}): Promise<IvaltAuthResultResponse> {
   return ivaltRequest<IvaltAuthResultResponse>("/biometric-auth-result", {
-    request_id: requestId,
+    request_id: params.requestId,
+    mobile: `${params.countryCode}${params.mobile}`,
   });
 }
 
