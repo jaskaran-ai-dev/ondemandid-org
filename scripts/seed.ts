@@ -9,29 +9,33 @@ const db = drizzle(client, { schema: { customers } })
 async function main() {
   console.log("Seeding database...")
   
+  // Update existing customer or create new one
   const existing = await db.select().from(customers).where(
     sql`country_code = '+91' AND mobile = '9530654704'`
   ).limit(1)
   
+  let result
   if (existing.length > 0) {
-    console.log("Customer already exists, skipping...")
-    await client.end()
-    return
+    console.log("Customer exists, updating...")
+    result = await db.update(customers)
+      .set({ idConnection: "IVALT" })
+      .where(sql`mobile = '9530654704'`)
+      .returning()
+  } else {
+    result = await db.insert(customers).values({
+      companyName: "iVALT Test Org",
+      contactName: "Test User",
+      email: "test@ivalt.com",
+      countryCode: "+91",
+      mobile: "9530654704",
+      initialUsers: 10,
+      idConnection: "IVALT",
+      status: "active",
+      notes: "Dummy test data",
+    }).returning()
   }
-
-  const result = await db.insert(customers).values({
-    companyName: "iVALT Test Org",
-    contactName: "Test User",
-    email: "test@ivalt.com",
-    countryCode: "+91",
-    mobile: "9530654704",
-    initialUsers: 10,
-    idConnection: "ivalt",
-    status: "active",
-    notes: "Dummy test data",
-  }).returning()
   
-  console.log("Added customer:", result[0])
+  console.log("Customer:", result[0])
   await client.end()
 }
 
