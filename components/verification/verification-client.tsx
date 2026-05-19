@@ -10,7 +10,7 @@ import {
 import { useVerify, useStatus } from "@/hooks/use-api"
 import type { VerifyValues } from "@/lib/validation"
 
-const MAX_ATTEMPTS = 150 // ~5 minutes
+const MAX_ATTEMPTS = 60 // 2 minutes (2s polling x 60)
 
 export function VerificationClient() {
   const [state, setState] = useState<VerificationState>({ kind: "idle" })
@@ -167,7 +167,7 @@ export function VerificationClient() {
               The user authenticates with face or fingerprint biometrics.
             </Step>
             <Step n={5}>
-              We poll for the result every 2 seconds for up to 5 minutes.
+              We poll for the result every 2 seconds for up to 2 minutes.
             </Step>
           </ol>
         </div>
