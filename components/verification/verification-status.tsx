@@ -29,11 +29,11 @@ export type VerificationState =
       startedAt: number;
     }
   | {
-      kind: "authenticated"
-      requestId: string
-      idConnection: string
-      durationMs: number
-      details?: Record<string, unknown> | null
+      kind: 'authenticated';
+      requestId: string;
+      idConnection: string;
+      durationMs: number;
+      details?: Record<string, unknown> | null;
     }
   | { kind: 'failed'; requestId: string; ivaltStatusCode: number }
   | { kind: 'not_found'; ivaltStatusCode: number }
@@ -63,14 +63,14 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
     return <PendingPanel state={state} onReset={onReset} />;
   }
 
-  if (state.kind === "authenticated") {
-    const details = state.details
-    const name = details?.name as string | undefined
-    const email = details?.email as string | undefined
-    const mobile = details?.mobile as string | undefined
-    const countryCode = details?.country_code as string | undefined
-    const address = details?.address as string | undefined
-    const idConnection = details?.id_connection as string | undefined
+  if (state.kind === 'authenticated') {
+    const details = state.details;
+    const name = details?.name as string | undefined;
+    const email = details?.email as string | undefined;
+    const mobile = details?.mobile as string | undefined;
+    const countryCode = details?.country_code as string | undefined;
+    const address = details?.address as string | undefined;
+    const idConnection = details?.id_connection as string | undefined;
 
     return (
       <Frame
@@ -86,7 +86,7 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         {mobile && (
           <DetailsRow
             label="Mobile"
-            value={`${countryCode || ""} ${mobile}`.trim()}
+            value={`${countryCode || ''} ${mobile}`.trim()}
             mono
           />
         )}

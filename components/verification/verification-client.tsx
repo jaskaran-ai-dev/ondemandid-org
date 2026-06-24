@@ -10,7 +10,7 @@ import {
 import { useVerify, useStatus } from '@/hooks/use-api';
 import type { VerifyValues } from '@/lib/validation';
 
-const MAX_ATTEMPTS = 60 // 2 minutes (2s polling x 60)
+const MAX_ATTEMPTS = 60; // 2 minutes (2s polling x 60)
 
 export function VerificationClient() {
   const [state, setState] = useState<VerificationState>({ kind: 'idle' });
@@ -35,10 +35,10 @@ export function VerificationClient() {
           idConnection: lastValues?.idConnection ?? '',
           durationMs: startedAt ? Date.now() - startedAt : 0,
           details: statusData.details,
-        })
-        toast.success("Identity verified")
-      } else if (statusData.status === "failed") {
-        setRequestId(null)
+        });
+        toast.success('Identity verified');
+      } else if (statusData.status === 'failed') {
+        setRequestId(null);
         setState({
           kind: 'failed',
           requestId: requestId!,
@@ -78,7 +78,7 @@ export function VerificationClient() {
         });
       }
     }
-  }, [statusQuery.data?.status, state.kind, requestId, lastValues, startedAt])
+  }, [statusQuery.data?.status, state.kind, requestId, lastValues, startedAt]);
 
   async function startVerification(values: VerifyValues) {
     setLastValues(values);

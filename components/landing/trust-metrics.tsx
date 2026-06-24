@@ -21,7 +21,7 @@ const METRICS = [
   //   label: "Compliance ready",
   //   description: "Audit trail with IP, device, and timestamps",
   // },
-]
+];
 
 export function TrustMetrics() {
   return (

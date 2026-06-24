@@ -100,14 +100,14 @@ async function handleProductionMode(data: any, request: Request) {
   const requestId = requestRecord[0].id;
 
   // Log verification request
-  console.log("[Verify API] Production mode request:", {
+  console.log('[Verify API] Production mode request:', {
     requestId,
     idConnection,
     countryCode,
     mobile,
     ip,
     userAgent,
-  })
+  });
 
   // Call iVALT API to trigger push notification
   let ivaltResponse: any = null;
@@ -118,15 +118,15 @@ async function handleProductionMode(data: any, request: Request) {
       idConnection,
       countryCode,
       mobile,
-    })
-    ivaltStatusCode = 202 // iVALT returns 202 on success
-    ivaltResponse = authRequest
+    });
+    ivaltStatusCode = 202; // iVALT returns 202 on success
+    ivaltResponse = authRequest;
   } catch (error: any) {
-    console.error("iVALT API error:", error)
+    console.error('iVALT API error:', error);
     // Extract status code from error message if present
-    const match = error?.message?.match?.(/iVALT API error \((\d+)\)/)
-    ivaltStatusCode = match ? parseInt(match[1], 10) : null
-    ivaltResponse = { error: String(error) }
+    const match = error?.message?.match?.(/iVALT API error \((\d+)\)/);
+    ivaltStatusCode = match ? parseInt(match[1], 10) : null;
+    ivaltResponse = { error: String(error) };
   }
 
   // Update request with iVALT response

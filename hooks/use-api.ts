@@ -18,10 +18,10 @@ interface VerifyResponse {
 }
 
 interface StatusResponse {
-  status: "initiated" | "pending" | "authenticated" | "failed" | "not_found"
-  ivaltStatusCode?: number
-  completedAt?: string
-  details?: Record<string, unknown> | null
+  status: 'initiated' | 'pending' | 'authenticated' | 'failed' | 'not_found';
+  ivaltStatusCode?: number;
+  completedAt?: string;
+  details?: Record<string, unknown> | null;
 }
 
 // Signup mutation
@@ -94,12 +94,17 @@ export function useStatus(requestId: string, enabled: boolean = true) {
       return res.json();
     },
     enabled: enabled && !!requestId,
-    refetchInterval: (query) => {
-      const data = query.state.data as StatusResponse | undefined
-      if (data && (data.status === "authenticated" || data.status === "failed" || data.status === "not_found")) {
-        return false
+    refetchInterval: query => {
+      const data = query.state.data as StatusResponse | undefined;
+      if (
+        data &&
+        (data.status === 'authenticated' ||
+          data.status === 'failed' ||
+          data.status === 'not_found')
+      ) {
+        return false;
       }
-      return 2000
+      return 2000;
     },
     refetchIntervalInBackground: true,
     retry: 1,

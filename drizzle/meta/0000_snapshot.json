@@ -92,16 +92,12 @@
         "customers_email_unique": {
           "name": "customers_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "customers_id_connection_unique": {
           "name": "customers_id_connection_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id_connection"
-          ]
+          "columns": ["id_connection"]
         }
       },
       "policies": {},
