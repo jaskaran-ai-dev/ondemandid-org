@@ -2,11 +2,11 @@
 // In production, replace with Redis-backed rate limiting
 
 type RateLimitEntry = {
-  count: number
-  resetAt: number
-}
+  count: number;
+  resetAt: number;
+};
 
-const rateLimitStore = new Map<string, RateLimitEntry>()
+const rateLimitStore = new Map<string, RateLimitEntry>();
 
 /**
  * Check if a request should be rate limited.
@@ -18,27 +18,35 @@ const rateLimitStore = new Map<string, RateLimitEntry>()
 export function checkRateLimit(
   key: string,
   maxRequests: number = 10,
-  windowMs: number = 60_000,
+  windowMs: number = 60_000
 ): { allowed: boolean; remaining: number; resetAt: number } {
-  const now = Date.now()
-  const entry = rateLimitStore.get(key)
+  const now = Date.now();
+  const entry = rateLimitStore.get(key);
 
   if (!entry || now > entry.resetAt) {
     // New window
     const newEntry: RateLimitEntry = {
       count: 1,
       resetAt: now + windowMs,
-    }
-    rateLimitStore.set(key, newEntry)
-    return { allowed: true, remaining: maxRequests - 1, resetAt: newEntry.resetAt }
+    };
+    rateLimitStore.set(key, newEntry);
+    return {
+      allowed: true,
+      remaining: maxRequests - 1,
+      resetAt: newEntry.resetAt,
+    };
   }
 
   if (entry.count >= maxRequests) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt }
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
   }
 
-  entry.count += 1
-  return { allowed: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt }
+  entry.count += 1;
+  return {
+    allowed: true,
+    remaining: maxRequests - entry.count,
+    resetAt: entry.resetAt,
+  };
 }
 
 /**
@@ -46,43 +54,45 @@ export function checkRateLimit(
  * For HTML email templates, use a proper HTML sanitizer like DOMPurify server-side.
  */
 export function stripHtml(input: string | null | undefined): string {
-  if (!input) return ""
+  if (!input) return '';
   return input
-    .replace(/<script[^>]*>.*?<\/script>/gi, "")
-    .replace(/<style[^>]*>.*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .trim()
+    .replace(/<script[^>]*>.*?<\/script>/gi, '')
+    .replace(/<style[^>]*>.*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim();
 }
 
 /**
  * Verify a Cloudflare Turnstile token server-side.
  */
 export async function verifyTurnstileToken(token: string): Promise<boolean> {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
   if (!secretKey) {
-    console.warn("TURNSTILE_SECRET_KEY not set — skipping CAPTCHA verification")
-    return true
+    console.warn(
+      'TURNSTILE_SECRET_KEY not set — skipping CAPTCHA verification'
+    );
+    return true;
   }
 
   try {
     const response = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
       {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           secret: secretKey,
           response: token,
         }).toString(),
-      },
-    )
+      }
+    );
 
-    const data = await response.json()
-    return data.success === true
+    const data = await response.json();
+    return data.success === true;
   } catch (error) {
-    console.error("Turnstile verification error:", error)
-    return false
+    console.error('Turnstile verification error:', error);
+    return false;
   }
 }

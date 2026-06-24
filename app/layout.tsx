@@ -1,83 +1,84 @@
-import type { Metadata, Viewport } from "next"
-import { Inter, Source_Serif_4 } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import { CustomThemeProvider } from "@/components/theme-provider-custom"
-import { QueryProvider } from "@/components/query-provider"
-import { Toaster } from "@/components/ui/sonner"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import "./globals.css"
+import type { Metadata, Viewport } from 'next';
+import { Inter, Source_Serif_4 } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import { CustomThemeProvider } from '@/components/theme-provider-custom';
+import { QueryProvider } from '@/components/query-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/site-footer';
+import './globals.css';
 
 const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-})
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-})
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+});
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://ondemandid.ivalt.com"
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://ondemandid.ivalt.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "iVALT OnDemand ID — Password-free Identity Verification",
-    template: "%s — iVALT OnDemand ID",
+    default: 'iVALT OnDemand ID — Password-free Identity Verification',
+    template: '%s — iVALT OnDemand ID',
   },
   description:
-    "Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition delivered through secure push notifications.",
+    'Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition delivered through secure push notifications.',
   keywords: [
-    "biometric authentication",
-    "passwordless login",
-    "identity verification",
-    "push notification auth",
-    "enterprise security",
-    "face recognition",
-    "fingerprint authentication",
-    "zero trust",
+    'biometric authentication',
+    'passwordless login',
+    'identity verification',
+    'push notification auth',
+    'enterprise security',
+    'face recognition',
+    'fingerprint authentication',
+    'zero trust',
   ],
-  authors: [{ name: "iVALT" }],
-  creator: "iVALT",
-  publisher: "iVALT",
+  authors: [{ name: 'iVALT' }],
+  creator: 'iVALT',
+  publisher: 'iVALT',
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type: 'website',
+    locale: 'en_US',
     url: baseUrl,
-    siteName: "iVALT OnDemand ID",
-    title: "iVALT OnDemand ID — Password-free Identity Verification",
+    siteName: 'iVALT OnDemand ID',
+    title: 'iVALT OnDemand ID — Password-free Identity Verification',
     description:
-      "Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition delivered through secure push notifications.",
+      'Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition delivered through secure push notifications.',
     images: [
       {
-        url: "/og-image.png",
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: "iVALT OnDemand ID — Password-free biometric identity verification",
+        alt: 'iVALT OnDemand ID — Password-free biometric identity verification',
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "iVALT OnDemand ID — Password-free Identity Verification",
+    card: 'summary_large_image',
+    title: 'iVALT OnDemand ID — Password-free Identity Verification',
     description:
-      "Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition.",
-    images: ["/og-image.png"],
-    creator: "@ivalt",
+      'Verify user identities on demand through biometric authentication. Eliminate passwords with face and fingerprint recognition.',
+    images: ['/og-image.png'],
+    creator: '@ivalt',
   },
   verification: {
     google: undefined,
@@ -85,21 +86,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: baseUrl,
   },
-}
+};
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1220" },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b1220' },
   ],
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
@@ -116,8 +117,8 @@ export default function RootLayout({
             <Toaster richColors position="top-center" />
           </CustomThemeProvider>
         </QueryProvider>
-        {process.env.NODE_ENV === "production" && <Analytics />}
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
-  )
+  );
 }

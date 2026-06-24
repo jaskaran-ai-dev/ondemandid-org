@@ -51,12 +51,14 @@ Based on research, suggested phase structure:
    - Addresses: HARD-07
 
 **Phase ordering rationale:**
+
 - Testing first because it unlocks CI, which unlocks confidence to add the other layers
 - Error tracking before logging because Sentry provides immediate production visibility with minimal code changes
 - Security before compliance because a security breach invalidates compliance
 - Admin dashboard last because it depends on audit log infrastructure from Phase 6
 
 **Research flags for phases:**
+
 - Phase 5 (Pino + OpenTelemetry): The `pino-opentelemetry-transport` is still actively developed. If you don't need trace correlation yet, skip OpenTelemetry and just use Pino directly. Add OpenTelemetry later when you need distributed tracing across iVALT API → DB → email.
 - Phase 6 (Audit logs): No off-the-shelf package for Next.js audit logging. Must be custom. The schema design needs care — audit logs must be append-only with no update/delete operations.
 - Phase 4 (CSP with nonces): Requires dynamic rendering (Server Components or proxy layer) to generate per-request nonces. May conflict with any static generation strategy. Worth the tradeoff for biometric identity verification.
@@ -64,16 +66,16 @@ Based on research, suggested phase structure:
 
 ## Confidence Assessment
 
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Testing Stack | HIGH | Vitest + Playwright is the community standard per official Next.js docs, multiple 2026 sources |
-| CI/CD | HIGH | GitHub Actions + Vercel is the de facto standard for Next.js projects on GitHub |
-| Error Tracking | HIGH | Sentry is the market leader, has official Next.js 16 support wizard |
-| Structured Logging | MEDIUM | Pino is the fastest logger, but OpenTelemetry integration is still maturing |
-| Rate Limiting | HIGH | Upstash Ratelimit is purpose-built for serverless, Vercel docs recommend it |
-| Security Headers | HIGH | No dependency needed — configured in `next.config.ts`. Next.js CSP docs are authoritative. |
-| Compliance | MEDIUM | Audit log is custom (no off-the-shelf). SOC 2 prep depends on business context, not tech. |
-| Uptime Monitoring | MEDIUM | Better Stack is solid but there are many alternatives. The health endpoint is the key artifact. |
+| Area               | Confidence | Notes                                                                                           |
+| ------------------ | ---------- | ----------------------------------------------------------------------------------------------- |
+| Testing Stack      | HIGH       | Vitest + Playwright is the community standard per official Next.js docs, multiple 2026 sources  |
+| CI/CD              | HIGH       | GitHub Actions + Vercel is the de facto standard for Next.js projects on GitHub                 |
+| Error Tracking     | HIGH       | Sentry is the market leader, has official Next.js 16 support wizard                             |
+| Structured Logging | MEDIUM     | Pino is the fastest logger, but OpenTelemetry integration is still maturing                     |
+| Rate Limiting      | HIGH       | Upstash Ratelimit is purpose-built for serverless, Vercel docs recommend it                     |
+| Security Headers   | HIGH       | No dependency needed — configured in `next.config.ts`. Next.js CSP docs are authoritative.      |
+| Compliance         | MEDIUM     | Audit log is custom (no off-the-shelf). SOC 2 prep depends on business context, not tech.       |
+| Uptime Monitoring  | MEDIUM     | Better Stack is solid but there are many alternatives. The health endpoint is the key artifact. |
 
 ## Gaps to Address
 

@@ -74,6 +74,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Provide information about the product and guide users to relevant actions
 
 **Features**:
+
 - Hero section with value proposition
 - Trust metrics (accuracy rate, verification time, security features)
 - Feature highlights showing key capabilities
@@ -88,6 +89,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Allow organizations to register for trial access
 
 **Features**:
+
 - Registration form with validation:
   - Company name (2-255 characters)
   - Primary contact name (2-255 characters)
@@ -104,6 +106,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Allow authorized users to verify identities in real-time
 
 **Features**:
+
 - Verification form with:
   - IDCONNECTION code input (auto-uppercase, 4-12 alphanumeric characters)
   - Mobile phone number input with country code selector
@@ -128,6 +131,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Confirm successful registration and provide next steps
 
 **Content**:
+
 - Company name and registration confirmation
 - Reference ID for tracking
 - Timeline for IDCONNECTION code provisioning (within one business day)
@@ -144,6 +148,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Alert team about new registration requiring review
 
 **Content**:
+
 - Company name and contact details
 - Primary contact name and email
 - Phone number
@@ -159,6 +164,7 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 **Purpose**: Notify team about verification attempts for audit purposes
 
 **Content**:
+
 - IDCONNECTION code used
 - Mobile phone number
 - Verification status
@@ -171,18 +177,21 @@ iVALT OnDemand ID is a secure identity verification platform that enables enterp
 The platform integrates with the iVALT authentication system to provide secure biometric verification:
 
 **Authentication Flow**:
+
 - When a verification request is initiated, the platform communicates with the iVALT system
 - iVALT sends a push notification to the user's mobile app
 - The user authenticates using their enrolled biometrics in the app
 - The authentication result is returned to the platform
 
 **Security Features**:
+
 - End-to-end encryption for all communications
 - Biometric data processed on-device (never stored centrally)
 - Real-time fraud detection and prevention
 - Geo-location and time-window validation capabilities (optional)
 
 **Status Codes**:
+
 - **200**: User authenticated successfully
 - **403**: Authentication failed or rejected
 - **404**: User not found in iVALT system
@@ -195,6 +204,7 @@ The platform integrates with the iVALT authentication system to provide secure b
 **Purpose**: Store information about registered organizations
 
 **Data Stored**:
+
 - Unique organization identifier
 - Company name
 - Primary contact person name
@@ -212,6 +222,7 @@ The platform integrates with the iVALT authentication system to provide secure b
 **Purpose**: Maintain an audit trail of all verification attempts
 
 **Data Stored**:
+
 - Unique request identifier
 - IDCONNECTION code used
 - User's mobile phone number (country code + mobile number)
@@ -225,6 +236,7 @@ The platform integrates with the iVALT authentication system to provide secure b
 - Completion timestamp (if completed)
 
 **Audit Trail Benefits**:
+
 - Complete history of all verification attempts
 - Ability to investigate issues or disputes
 - Compliance and security monitoring
@@ -233,16 +245,19 @@ The platform integrates with the iVALT authentication system to provide secure b
 ## Security & Privacy
 
 **Data Protection**:
+
 - All data stored securely with access controls
 - Regular backups and disaster recovery
 - Compliance with data protection regulations
 
 **Authentication Security**:
+
 - Biometric authentication processed on-device
 - No passwords stored or transmitted
 - Real-time fraud detection
 
 **Access Control**:
+
 - IDCONNECTION codes ensure only authorized organizations can initiate verifications
 - Manual approval process prevents unauthorized access (handled by iVALT team)
 - Admin team oversight for all registrations (handled by iVALT team)

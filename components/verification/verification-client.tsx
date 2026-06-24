@@ -1,102 +1,102 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { VerificationForm } from "@/components/verification/verification-form"
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { VerificationForm } from '@/components/verification/verification-form';
 import {
   VerificationStatus,
   type VerificationState,
-} from "@/components/verification/verification-status"
-import { useVerify, useStatus } from "@/hooks/use-api"
-import type { VerifyValues } from "@/lib/validation"
+} from '@/components/verification/verification-status';
+import { useVerify, useStatus } from '@/hooks/use-api';
+import type { VerifyValues } from '@/lib/validation';
 
-const MAX_ATTEMPTS = 150 // ~5 minutes
+const MAX_ATTEMPTS = 150; // ~5 minutes
 
 export function VerificationClient() {
-  const [state, setState] = useState<VerificationState>({ kind: "idle" })
-  const [lastValues, setLastValues] = useState<VerifyValues | null>(null)
-  const [requestId, setRequestId] = useState<string | null>(null)
-  const [attempt, setAttempt] = useState(1)
-  const [startedAt, setStartedAt] = useState<number | null>(null)
+  const [state, setState] = useState<VerificationState>({ kind: 'idle' });
+  const [lastValues, setLastValues] = useState<VerifyValues | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(1);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
-  const verifyMutation = useVerify()
-  const statusQuery = useStatus(requestId ?? "", state.kind === "pending")
+  const verifyMutation = useVerify();
+  const statusQuery = useStatus(requestId ?? '', state.kind === 'pending');
 
   // Handle status changes
   useEffect(() => {
-    if (statusQuery.data && state.kind === "pending") {
-      const statusData = statusQuery.data
+    if (statusQuery.data && state.kind === 'pending') {
+      const statusData = statusQuery.data;
 
-      if (statusData.status === "authenticated") {
-        setRequestId(null)
+      if (statusData.status === 'authenticated') {
+        setRequestId(null);
         setState({
-          kind: "authenticated",
+          kind: 'authenticated',
           requestId: requestId!,
-          idConnection: lastValues?.idConnection ?? "",
+          idConnection: lastValues?.idConnection ?? '',
           durationMs: startedAt ? Date.now() - startedAt : 0,
-        })
-        toast.success("Identity verified")
-      } else if (statusData.status === "failed") {
-        setRequestId(null)
+        });
+        toast.success('Identity verified');
+      } else if (statusData.status === 'failed') {
+        setRequestId(null);
         setState({
-          kind: "failed",
+          kind: 'failed',
           requestId: requestId!,
           ivaltStatusCode: statusData.ivaltStatusCode ?? 403,
-        })
-        toast.error("Verification denied")
-      } else if (statusData.status === "not_found") {
-        setRequestId(null)
+        });
+        toast.error('Verification denied');
+      } else if (statusData.status === 'not_found') {
+        setRequestId(null);
         setState({
-          kind: "not_found",
+          kind: 'not_found',
           ivaltStatusCode: statusData.ivaltStatusCode ?? 404,
-        })
+        });
       } else {
         // Still pending: bump attempt counter
-        setAttempt((prev) => {
-          const newAttempt = prev + 1
+        setAttempt(prev => {
+          const newAttempt = prev + 1;
           if (newAttempt >= MAX_ATTEMPTS) {
-            setRequestId(null)
+            setRequestId(null);
             setState({
-              kind: "failed",
+              kind: 'failed',
               requestId: requestId!,
               ivaltStatusCode: 403,
-            })
-            toast.error("Verification timed out")
+            });
+            toast.error('Verification timed out');
           } else {
-            setState((prev) =>
-              prev.kind === "pending"
+            setState(prev =>
+              prev.kind === 'pending'
                 ? {
                     ...prev,
                     attempt: newAttempt,
                     ivaltStatusCode: statusData.ivaltStatusCode ?? 422,
                   }
-                : prev,
-            )
+                : prev
+            );
           }
-          return newAttempt
-        })
+          return newAttempt;
+        });
       }
     }
-  }, [statusQuery.data, state.kind, requestId, lastValues, startedAt])
+  }, [statusQuery.data, state.kind, requestId, lastValues, startedAt]);
 
   async function startVerification(values: VerifyValues) {
-    setLastValues(values)
-    setState({ kind: "submitting" })
+    setLastValues(values);
+    setState({ kind: 'submitting' });
 
     try {
-      const result = await verifyMutation.mutateAsync(values)
+      const result = await verifyMutation.mutateAsync(values);
 
       if (result.ivaltStatusCode === 404) {
-        setState({ kind: "not_found", ivaltStatusCode: 404 })
-        return
+        setState({ kind: 'not_found', ivaltStatusCode: 404 });
+        return;
       }
 
       if (result.ok && result.id) {
-        setRequestId(result.id)
-        setAttempt(1)
-        setStartedAt(Date.now())
+        setRequestId(result.id);
+        setAttempt(1);
+        setStartedAt(Date.now());
         setState({
-          kind: "pending",
+          kind: 'pending',
           requestId: result.id,
           idConnection: values.idConnection,
           countryCode: values.countryCode,
@@ -105,7 +105,7 @@ export function VerificationClient() {
           maxAttempts: MAX_ATTEMPTS,
           ivaltStatusCode: result.ivaltStatusCode ?? 422,
           startedAt: Date.now(),
-        })
+        });
       }
     } catch {
       // Error handling is done in the mutation
@@ -113,21 +113,21 @@ export function VerificationClient() {
   }
 
   function handleReset() {
-    setRequestId(null)
-    setAttempt(1)
-    setStartedAt(null)
-    setState({ kind: "idle" })
+    setRequestId(null);
+    setAttempt(1);
+    setStartedAt(null);
+    setState({ kind: 'idle' });
   }
 
   function handleRetry() {
     if (lastValues) {
-      void startVerification(lastValues)
+      void startVerification(lastValues);
     } else {
-      handleReset()
+      handleReset();
     }
   }
 
-  const showForm = state.kind === "idle" || state.kind === "submitting"
+  const showForm = state.kind === 'idle' || state.kind === 'submitting';
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-12">
@@ -156,7 +156,7 @@ export function VerificationClient() {
               We validate the IDCONNECTION code against active customers.
             </Step>
             <Step n={2}>
-              An audit record is created with status{" "}
+              An audit record is created with status{' '}
               <code className="font-mono text-xs">initiated</code>.
             </Step>
             <Step n={3}>
@@ -193,16 +193,10 @@ export function VerificationClient() {
         </div>
       </aside>
     </div>
-  )
+  );
 }
 
-function Step({
-  n,
-  children,
-}: {
-  n: number
-  children: React.ReactNode
-}) {
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <li className="flex gap-3">
       <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 font-mono text-xs font-semibold text-primary">
@@ -210,7 +204,7 @@ function Step({
       </span>
       <p className="text-muted-foreground leading-relaxed">{children}</p>
     </li>
-  )
+  );
 }
 
 function DemoCode({ code, hint }: { code: string; hint: string }) {
@@ -219,5 +213,5 @@ function DemoCode({ code, hint }: { code: string; hint: string }) {
       <code className="font-mono text-xs font-semibold">{code}</code>
       <span className="text-muted-foreground">{hint}</span>
     </li>
-  )
+  );
 }

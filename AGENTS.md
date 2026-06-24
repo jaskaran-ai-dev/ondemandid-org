@@ -5,6 +5,7 @@
 iVALT OnDemand ID is a Next.js 16 enterprise SaaS application for password-free identity verification. It lets organizations verify users through biometric authentication (face/fingerprint) delivered via secure push notifications to the iVALT mobile app.
 
 **Key Features:**
+
 - Customer signup with trial provisioning
 - On-demand biometric identity verification
 - Real-time status polling for verification flows
@@ -18,18 +19,18 @@ iVALT OnDemand ID is a Next.js 16 enterprise SaaS application for password-free 
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript 6 |
-| Styling | Tailwind CSS 4 + tw-animate-css |
-| UI Components | Radix UI primitives + custom shadcn-style components |
-| State Management | React Query (TanStack Query) |
-| Forms | React Hook Form + Zod validation |
-| Database | Drizzle ORM with dual support (PostgreSQL / SQLite) |
-| Email | AWS SES with Nodemailer SMTP fallback |
-| Icons | Lucide React |
-| Fonts | Inter (sans), Source Serif 4 (serif), Bespoke Stencil (accent) |
+| Layer            | Technology                                                     |
+| ---------------- | -------------------------------------------------------------- |
+| Framework        | Next.js 16 (App Router, Turbopack)                             |
+| Language         | TypeScript 6                                                   |
+| Styling          | Tailwind CSS 4 + tw-animate-css                                |
+| UI Components    | Radix UI primitives + custom shadcn-style components           |
+| State Management | React Query (TanStack Query)                                   |
+| Forms            | React Hook Form + Zod validation                               |
+| Database         | Drizzle ORM with dual support (PostgreSQL / SQLite)            |
+| Email            | AWS SES with Nodemailer SMTP fallback                          |
+| Icons            | Lucide React                                                   |
+| Fonts            | Inter (sans), Source Serif 4 (serif), Bespoke Stencil (accent) |
 
 ### Project Structure
 
@@ -95,6 +96,7 @@ ondemandid-org/
 ### Components
 
 1. **UI Components** use `data-slot` attributes for styling hooks:
+
    ```tsx
    <input data-slot="input" className={cn(...)} />
    ```
@@ -106,12 +108,13 @@ ondemandid-org/
 
 3. **Icon imports** use Lucide React:
    ```tsx
-   import { ShieldCheck, ArrowRight } from "lucide-react"
+   import { ShieldCheck, ArrowRight } from 'lucide-react';
    ```
 
 ### Styling
 
 1. **Tailwind classes** are merged with `cn()` utility:
+
    ```tsx
    className={cn("base-classes", conditional && "conditional-classes", className)}
    ```
@@ -143,6 +146,7 @@ ondemandid-org/
 ### Tables (both PostgreSQL and SQLite)
 
 **customers**
+
 - `id`: auto-increment primary key
 - `companyName`: string, required
 - `contactName`: string, required
@@ -154,6 +158,7 @@ ondemandid-org/
 - `createdAt`: timestamp
 
 **ondemandRequests**
+
 - `id`: auto-increment primary key
 - `requestId`: string, unique (external iVALT request ID)
 - `customerId`: foreign key to customers
@@ -171,17 +176,17 @@ ondemandid-org/
 
 Required variables (see `.env.example` for full list):
 
-| Variable | Purpose |
-|----------|---------|
-| `DB_TYPE` | `postgres` or `sqlite` |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `SQLITE_DB_PATH` | SQLite file path |
-| `DEMO_MODE` | `true` to enable simulation mode |
-| `IVALT_API_KEY` | iVALT API authentication |
-| `IVALT_API_BASE_URL` | iVALT API endpoint |
-| `EMAIL_PROVIDER` | `ses` or `smtp` |
-| `ADMIN_EMAIL` | Admin notification recipient |
-| `EMAIL_FROM` | Sender address |
+| Variable             | Purpose                          |
+| -------------------- | -------------------------------- |
+| `DB_TYPE`            | `postgres` or `sqlite`           |
+| `DATABASE_URL`       | PostgreSQL connection string     |
+| `SQLITE_DB_PATH`     | SQLite file path                 |
+| `DEMO_MODE`          | `true` to enable simulation mode |
+| `IVALT_API_KEY`      | iVALT API authentication         |
+| `IVALT_API_BASE_URL` | iVALT API endpoint               |
+| `EMAIL_PROVIDER`     | `ses` or `smtp`                  |
+| `ADMIN_EMAIL`        | Admin notification recipient     |
+| `EMAIL_FROM`         | Sender address                   |
 
 ---
 
@@ -200,6 +205,7 @@ We use a **custom theme provider** (`components/theme-provider-custom.tsx`) inst
 ### iVALT Integration
 
 The iVALT API client (`lib/ivalt/`) handles:
+
 - Triggering push notifications for biometric verification
 - Polling for authentication results
 - Status code mapping (200 success, 403 denied, 404 not found, 422 pending)
@@ -207,6 +213,7 @@ The iVALT API client (`lib/ivalt/`) handles:
 ### Demo Mode
 
 When `DEMO_MODE=true`:
+
 - API routes skip database operations and iVALT calls
 - Simulated responses mimic real API behavior
 - In-memory `simRequests` store tracks fake request state

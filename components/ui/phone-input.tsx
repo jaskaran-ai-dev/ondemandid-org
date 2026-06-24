@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from 'react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover';
 import {
   Command,
   CommandEmpty,
@@ -14,23 +14,23 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { COUNTRY_CODES, type CountryCode } from "@/lib/country-codes"
+} from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { COUNTRY_CODES, type CountryCode } from '@/lib/country-codes';
 
 type PhoneInputProps = {
-  countryCode: string
-  mobile: string
-  onCountryCodeChange: (code: string) => void
-  onMobileChange: (mobile: string) => void
-  disabled?: boolean
-  id?: string
-  ariaInvalid?: boolean
-  ariaDescribedBy?: string
-  leftIcon?: React.ReactNode
-}
+  countryCode: string;
+  mobile: string;
+  onCountryCodeChange: (code: string) => void;
+  onMobileChange: (mobile: string) => void;
+  disabled?: boolean;
+  id?: string;
+  ariaInvalid?: boolean;
+  ariaDescribedBy?: string;
+  leftIcon?: React.ReactNode;
+};
 
 export function PhoneInput({
   countryCode,
@@ -43,12 +43,12 @@ export function PhoneInput({
   ariaDescribedBy,
   leftIcon,
 }: PhoneInputProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   const selected: CountryCode | undefined = React.useMemo(
-    () => COUNTRY_CODES.find((c) => c.code === countryCode) ?? COUNTRY_CODES[0],
-    [countryCode],
-  )
+    () => COUNTRY_CODES.find(c => c.code === countryCode) ?? COUNTRY_CODES[0],
+    [countryCode]
+  );
 
   return (
     <div className="flex w-full items-stretch gap-2">
@@ -78,23 +78,23 @@ export function PhoneInput({
             <CommandList>
               <CommandEmpty>No country found.</CommandEmpty>
               <CommandGroup>
-                {COUNTRY_CODES.map((c) => {
-                  const value = `${c.name} ${c.code} ${c.iso}`
+                {COUNTRY_CODES.map(c => {
+                  const value = `${c.name} ${c.code} ${c.iso}`;
                   const isSelected =
-                    selected?.iso === c.iso && selected?.code === c.code
+                    selected?.iso === c.iso && selected?.code === c.code;
                   return (
                     <CommandItem
                       key={`${c.iso}-${c.code}`}
                       value={value}
                       onSelect={() => {
-                        onCountryCodeChange(c.code)
-                        setOpen(false)
+                        onCountryCodeChange(c.code);
+                        setOpen(false);
                       }}
                     >
                       <Check
                         className={cn(
-                          "mr-2 size-4",
-                          isSelected ? "opacity-100" : "opacity-0",
+                          'mr-2 size-4',
+                          isSelected ? 'opacity-100' : 'opacity-0'
                         )}
                       />
                       <span className="mr-2 text-base leading-none" aria-hidden>
@@ -105,7 +105,7 @@ export function PhoneInput({
                         {c.code}
                       </span>
                     </CommandItem>
-                  )
+                  );
                 })}
               </CommandGroup>
             </CommandList>
@@ -123,13 +123,13 @@ export function PhoneInput({
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
         leftIcon={leftIcon}
-        onChange={(e) => {
+        onChange={e => {
           // Strip everything but digits.
-          const digits = e.target.value.replace(/\D/g, "").slice(0, 14)
-          onMobileChange(digits)
+          const digits = e.target.value.replace(/\D/g, '').slice(0, 14);
+          onMobileChange(digits);
         }}
         className="flex-1"
       />
     </div>
-  )
+  );
 }

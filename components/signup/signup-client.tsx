@@ -1,32 +1,32 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import Link from "next/link"
-import { ArrowRight, CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { SignupForm } from "@/components/signup/signup-form"
-import { useSignup } from "@/hooks/use-api"
-import type { SignupValues } from "@/lib/validation"
+import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { SignupForm } from '@/components/signup/signup-form';
+import { useSignup } from '@/hooks/use-api';
+import type { SignupValues } from '@/lib/validation';
 
 type SuccessState = {
-  id: string
-  companyName: string
-  email: string
-}
+  id: string;
+  companyName: string;
+  email: string;
+};
 
 export function SignupClient() {
-  const [success, setSuccess] = useState<SuccessState | null>(null)
-  const signupMutation = useSignup()
+  const [success, setSuccess] = useState<SuccessState | null>(null);
+  const signupMutation = useSignup();
 
   async function handleSubmit(values: SignupValues) {
     try {
-      const result = await signupMutation.mutateAsync(values)
+      const result = await signupMutation.mutateAsync(values);
       if (result.ok) {
         setSuccess({
           id: crypto.randomUUID(),
           companyName: values.companyName,
           email: values.email,
-        })
+        });
       }
     } catch {
       // Error handling is done in the mutation
@@ -34,13 +34,16 @@ export function SignupClient() {
   }
 
   if (success) {
-    return <SuccessScreen state={success} />
+    return <SuccessScreen state={success} />;
   }
 
   return (
     <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
       <div className="rounded-xl border border-border bg-card p-6 md:p-8">
-        <SignupForm onSubmit={handleSubmit} submitting={signupMutation.isPending} />
+        <SignupForm
+          onSubmit={handleSubmit}
+          submitting={signupMutation.isPending}
+        />
       </div>
       <aside className="flex flex-col gap-4">
         <div className="rounded-xl border border-border bg-secondary/40 p-6">
@@ -82,7 +85,7 @@ export function SignupClient() {
         </div>
       </aside>
     </div>
-  )
+  );
 }
 
 function Step({
@@ -90,9 +93,9 @@ function Step({
   title,
   children,
 }: {
-  n: number
-  title: string
-  children: React.ReactNode
+  n: number;
+  title: string;
+  children: React.ReactNode;
 }) {
   return (
     <li className="flex gap-3">
@@ -104,7 +107,7 @@ function Step({
         <p className="text-muted-foreground leading-relaxed">{children}</p>
       </div>
     </li>
-  )
+  );
 }
 
 function SuccessScreen({ state }: { state: SuccessState }) {
@@ -119,8 +122,8 @@ function SuccessScreen({ state }: { state: SuccessState }) {
       <p className="mt-3 text-pretty text-base leading-relaxed text-muted-foreground">
         Thank you for registering <strong>{state.companyName}</strong>. We sent
         a confirmation to <strong>{state.email}</strong>. An iVALT
-        representative will provision your IDCONNECTION code within one
-        business day.
+        representative will provision your IDCONNECTION code within one business
+        day.
       </p>
 
       <div className="mt-8 w-full max-w-md rounded-xl border border-border bg-card p-5 text-left">
@@ -145,5 +148,5 @@ function SuccessScreen({ state }: { state: SuccessState }) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

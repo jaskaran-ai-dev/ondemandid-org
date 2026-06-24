@@ -1,43 +1,49 @@
-"use client"
+'use client';
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, ShieldCheck } from "lucide-react"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { BuildingIcon, UserIcon, Mail01Icon, PhoneCall, User02Icon } from "@hugeicons/core-free-icons"
-import { signupSchema, type SignupValues } from "@/lib/validation"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { PhoneInput } from "@/components/ui/phone-input"
-import { CaptchaWidget } from "@/components/ui/captcha-widget"
-import { isCaptchaConfigured } from "@/lib/captcha"
-import { useState } from "react"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, ShieldCheck } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  BuildingIcon,
+  UserIcon,
+  Mail01Icon,
+  PhoneCall,
+  User02Icon,
+} from '@hugeicons/core-free-icons';
+import { signupSchema, type SignupValues } from '@/lib/validation';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { CaptchaWidget } from '@/components/ui/captcha-widget';
+import { isCaptchaConfigured } from '@/lib/captcha';
+import { useState } from 'react';
 
 type Props = {
-  onSubmit: (values: SignupValues) => Promise<void>
-  submitting?: boolean
-}
+  onSubmit: (values: SignupValues) => Promise<void>;
+  submitting?: boolean;
+};
 
 export function SignupForm({ onSubmit, submitting }: Props) {
-  const [captchaToken, setCaptchaToken] = useState<string>("")
-  const [captchaError, setCaptchaError] = useState<string>("")
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const [captchaError, setCaptchaError] = useState<string>('');
 
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      companyName: "",
-      contactName: "",
-      email: "",
-      countryCode: "+1",
-      mobile: "",
+      companyName: '',
+      contactName: '',
+      email: '',
+      countryCode: '+1',
+      mobile: '',
       initialUsers: 10,
-      notes: "",
-      captchaToken: "",
+      notes: '',
+      captchaToken: '',
     },
-    mode: "onTouched",
-  })
+    mode: 'onTouched',
+  });
 
   const {
     register,
@@ -45,21 +51,21 @@ export function SignupForm({ onSubmit, submitting }: Props) {
     setValue,
     watch,
     formState: { errors },
-  } = form
+  } = form;
 
-  const countryCode = watch("countryCode")
-  const mobile = watch("mobile")
+  const countryCode = watch('countryCode');
+  const mobile = watch('mobile');
 
-  const captchaConfigured = isCaptchaConfigured()
+  const captchaConfigured = isCaptchaConfigured();
 
-  const handleFormSubmit = handleSubmit(async (values) => {
+  const handleFormSubmit = handleSubmit(async values => {
     if (captchaConfigured && !captchaToken) {
-      setCaptchaError("Please complete the security verification above.")
-      return
+      setCaptchaError('Please complete the security verification above.');
+      return;
     }
-    setCaptchaError("")
-    await onSubmit({ ...values, captchaToken })
-  })
+    setCaptchaError('');
+    await onSubmit({ ...values, captchaToken });
+  });
 
   return (
     <form
@@ -79,7 +85,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             aria-invalid={!!errors.companyName}
             disabled={submitting}
             leftIcon={<HugeiconsIcon icon={BuildingIcon} size={18} />}
-            {...register("companyName")}
+            {...register('companyName')}
           />
         </Field>
 
@@ -95,7 +101,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             aria-invalid={!!errors.contactName}
             disabled={submitting}
             leftIcon={<HugeiconsIcon icon={UserIcon} size={18} />}
-            {...register("contactName")}
+            {...register('contactName')}
           />
         </Field>
 
@@ -113,7 +119,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             aria-invalid={!!errors.email}
             disabled={submitting}
             leftIcon={<HugeiconsIcon icon={Mail01Icon} size={18} />}
-            {...register("email")}
+            {...register('email')}
           />
         </Field>
 
@@ -128,14 +134,14 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             id="mobile"
             countryCode={countryCode}
             mobile={mobile}
-            onCountryCodeChange={(code) =>
-              setValue("countryCode", code, {
+            onCountryCodeChange={code =>
+              setValue('countryCode', code, {
                 shouldValidate: true,
                 shouldDirty: true,
               })
             }
-            onMobileChange={(m) =>
-              setValue("mobile", m, {
+            onMobileChange={m =>
+              setValue('mobile', m, {
                 shouldValidate: true,
                 shouldDirty: true,
               })
@@ -161,7 +167,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             aria-invalid={!!errors.initialUsers}
             disabled={submitting}
             leftIcon={<HugeiconsIcon icon={User02Icon} size={18} />}
-            {...register("initialUsers", { valueAsNumber: true })}
+            {...register('initialUsers', { valueAsNumber: true })}
           />
         </Field>
       </div>
@@ -177,7 +183,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
           rows={4}
           placeholder="We're evaluating iVALT for executive identity verification…"
           disabled={submitting}
-          {...register("notes")}
+          {...register('notes')}
         />
       </Field>
 
@@ -188,12 +194,14 @@ export function SignupForm({ onSubmit, submitting }: Props) {
             <span>Security verification required</span>
           </div>
           <CaptchaWidget
-            onVerify={(token) => {
-              setCaptchaToken(token)
-              setCaptchaError("")
+            onVerify={token => {
+              setCaptchaToken(token);
+              setCaptchaError('');
             }}
-            onError={() => setCaptchaError("Security verification failed. Please try again.")}
-            onExpire={() => setCaptchaToken("")}
+            onError={() =>
+              setCaptchaError('Security verification failed. Please try again.')
+            }
+            onExpire={() => setCaptchaToken('')}
           />
           {captchaError && (
             <p className="text-xs text-destructive" role="alert">
@@ -219,12 +227,12 @@ export function SignupForm({ onSubmit, submitting }: Props) {
               Submitting…
             </>
           ) : (
-            "Request trial access"
+            'Request trial access'
           )}
         </Button>
       </div>
     </form>
-  )
+  );
 }
 
 function Field({
@@ -235,17 +243,17 @@ function Field({
   children,
   className,
 }: {
-  label: string
-  htmlFor: string
-  error?: string
-  hint?: string
-  children: React.ReactNode
-  className?: string
+  label: string;
+  htmlFor: string;
+  error?: string;
+  hint?: string;
+  children: React.ReactNode;
+  className?: string;
 }) {
-  const errorId = `${htmlFor}-error`
-  const hintId = `${htmlFor}-hint`
+  const errorId = `${htmlFor}-error`;
+  const hintId = `${htmlFor}-hint`;
   return (
-    <div className={`flex flex-col gap-1.5 ${className ?? ""}`}>
+    <div className={`flex flex-col gap-1.5 ${className ?? ''}`}>
       <Label htmlFor={htmlFor} className="text-sm font-medium">
         {label}
       </Label>
@@ -260,5 +268,5 @@ function Field({
         </p>
       ) : null}
     </div>
-  )
+  );
 }

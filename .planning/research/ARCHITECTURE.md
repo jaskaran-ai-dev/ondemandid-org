@@ -82,17 +82,17 @@ Browser Request
 
 ## Component Boundaries — Production Additions
 
-| Component | Responsibility | Communicates With | New/Existing |
-|-----------|---------------|-------------------|--------------|
-| **Sentry (client)** | Capture browser errors, session replays, performance metrics | Sentry SaaS via DSN | NEW |
-| **Sentry (server)** | Capture server/edge errors, source maps, API performance | Sentry SaaS via DSN | NEW |
-| **Rate Limiter** | Enforce request quotas per IP/user per endpoint | Upstash Redis (HTTP API) | NEW |
-| **Security Headers** | Set CSP, HSTS, XFO in HTTP response headers | Browser via response | NEW (config) |
-| **Pino Logger** | Structured JSON logging from all server-side code | stdout (collector) or OTel transport | NEW |
-| **Audit Logger** | Immutable record of all verification events | `audit_logs` DB table | NEW |
-| **Health Check** | Expose app + DB liveness | Monitoring service (Better Stack) | NEW |
-| **CI Pipeline** | Lint, type-check, test, build, deploy | GitHub Actions → Vercel | NEW |
-| **Better Stack** | External uptime monitoring, status page | `/api/health` endpoint | NEW |
+| Component            | Responsibility                                               | Communicates With                    | New/Existing |
+| -------------------- | ------------------------------------------------------------ | ------------------------------------ | ------------ |
+| **Sentry (client)**  | Capture browser errors, session replays, performance metrics | Sentry SaaS via DSN                  | NEW          |
+| **Sentry (server)**  | Capture server/edge errors, source maps, API performance     | Sentry SaaS via DSN                  | NEW          |
+| **Rate Limiter**     | Enforce request quotas per IP/user per endpoint              | Upstash Redis (HTTP API)             | NEW          |
+| **Security Headers** | Set CSP, HSTS, XFO in HTTP response headers                  | Browser via response                 | NEW (config) |
+| **Pino Logger**      | Structured JSON logging from all server-side code            | stdout (collector) or OTel transport | NEW          |
+| **Audit Logger**     | Immutable record of all verification events                  | `audit_logs` DB table                | NEW          |
+| **Health Check**     | Expose app + DB liveness                                     | Monitoring service (Better Stack)    | NEW          |
+| **CI Pipeline**      | Lint, type-check, test, build, deploy                        | GitHub Actions → Vercel              | NEW          |
+| **Better Stack**     | External uptime monitoring, status page                      | `/api/health` endpoint               | NEW          |
 
 ## Data Flow — Verification Request (Hardened)
 
@@ -126,25 +126,25 @@ Separate rate limiters per route, not a single global limiter:
 ```typescript
 // Pattern for each API route
 // app/api/verify/route.ts
-import { verifyLimiter } from "@/lib/rate-limit"
+import { verifyLimiter } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") ?? "unknown"
-  const { success, limit, reset, remaining } = await verifyLimiter.limit(ip)
+  const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
+  const { success, limit, reset, remaining } = await verifyLimiter.limit(ip);
 
   if (!success) {
     return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
+      { error: 'Too many requests. Please try again later.' },
       {
         status: 429,
         headers: {
-          "X-RateLimit-Limit": limit.toString(),
-          "X-RateLimit-Remaining": remaining.toString(),
-          "X-RateLimit-Reset": reset.toString(),
-          "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': reset.toString(),
+          'Retry-After': Math.ceil((reset - Date.now()) / 1000).toString(),
         },
       }
-    )
+    );
   }
 
   // ... continue with handler logic
@@ -182,10 +182,11 @@ export async function POST(request: NextRequest) {
 ```
 
 **Log levels:**
+
 ```typescript
-logger.info({ event: "verification.requested", requestId, mobile })  // normal operations
-logger.warn({ event: "rate_limit.hit", ip, endpoint })               // potential abuse
-logger.error({ err, event: "ivalt_api.failed", requestId })          // service errors
+logger.info({ event: 'verification.requested', requestId, mobile }); // normal operations
+logger.warn({ event: 'rate_limit.hit', ip, endpoint }); // potential abuse
+logger.error({ err, event: 'ivalt_api.failed', requestId }); // service errors
 ```
 
 ## CI/CD Architecture
@@ -220,9 +221,9 @@ Playwright E2E tests against preview URL (separate job)
 Append-only audit log table — the foundation for SOC 2 and GDPR:
 
 ```typescript
-export const auditLogs = pgTable("audit_logs", {
-  id: serial("id").primaryKey(),
-  eventType: varchar("event_type", { length: 50 }).notNull(),
+export const auditLogs = pgTable('audit_logs', {
+  id: serial('id').primaryKey(),
+  eventType: varchar('event_type', { length: 50 }).notNull(),
   // Examples:
   //   'customer.signup.completed'
   //   'customer.signup.failed'
@@ -230,34 +231,34 @@ export const auditLogs = pgTable("audit_logs", {
   //   'verification.authenticated'
   //   'verification.failed'
   //   'verification.not_found'
-  actorId: integer("actor_id"),
-  actorType: varchar("actor_type", { length: 20 }).notNull(),
+  actorId: integer('actor_id'),
+  actorType: varchar('actor_type', { length: 20 }).notNull(),
   //   'customer' — the end user
   //   'admin'    — platform admin
   //   'system'   — automated process
-  resourceType: varchar("resource_type", { length: 50 }).notNull(),
+  resourceType: varchar('resource_type', { length: 50 }).notNull(),
   //   'customer'
   //   'ondemand_request'
-  resourceId: integer("resource_id"),
-  description: text("description"),
-  metadata: jsonb("metadata").default({}),
-  ipAddress: varchar("ip_address", { length: 45 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+  resourceId: integer('resource_id'),
+  description: text('description'),
+  metadata: jsonb('metadata').default({}),
+  ipAddress: varchar('ip_address', { length: 45 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
 ```
 
 **Key constraint:** Never expose UPDATE or DELETE operations on this table in the application layer. The only operation is INSERT (via Drizzle's `db.insert()`). This ensures immutability.
 
 ## Scalability Considerations
 
-| Concern | At 100 users | At 10K users | At 1M users |
-|---------|--------------|--------------|-------------|
-| **Rate Limiting** | Upstash Redis free tier (10K requests/day) | Upstash Pro (~$10/mo) | Dedicated multi-region Upstash |
-| **Error Tracking** | Sentry free (5K events/mo) | Sentry Team ($26/mo) | Sentry Business (custom pricing) |
-| **Logging** | Pino → stdout → Vercel logs | Pino → Better Stack (10GB/mo free) | Pino → OTel Collector → Datadog |
-| **Audit Logs** | Stored in main DB (Postgres) | Separate audit DB or archival | Dedicated log service (e.g. Axiom) |
-| **CI/CD** | GH Actions free (2000 min/mo) | GH Actions paid | Self-hosted runners |
-| **Uptime Monitoring** | Better Stack free (10 monitors) | Better Stack Pro ($29/mo) | Better Stack Enterprise |
+| Concern               | At 100 users                               | At 10K users                       | At 1M users                        |
+| --------------------- | ------------------------------------------ | ---------------------------------- | ---------------------------------- |
+| **Rate Limiting**     | Upstash Redis free tier (10K requests/day) | Upstash Pro (~$10/mo)              | Dedicated multi-region Upstash     |
+| **Error Tracking**    | Sentry free (5K events/mo)                 | Sentry Team ($26/mo)               | Sentry Business (custom pricing)   |
+| **Logging**           | Pino → stdout → Vercel logs                | Pino → Better Stack (10GB/mo free) | Pino → OTel Collector → Datadog    |
+| **Audit Logs**        | Stored in main DB (Postgres)               | Separate audit DB or archival      | Dedicated log service (e.g. Axiom) |
+| **CI/CD**             | GH Actions free (2000 min/mo)              | GH Actions paid                    | Self-hosted runners                |
+| **Uptime Monitoring** | Better Stack free (10 monitors)            | Better Stack Pro ($29/mo)          | Better Stack Enterprise            |
 
 ## Sources
 

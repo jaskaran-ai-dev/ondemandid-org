@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import Image from "next/image"
-import { useTheme } from "@/components/theme-provider-custom"
-import { ThemeToggle } from "@/components/theme-toggle"
+import Link from 'next/link';
+import Image from 'next/image';
+import { useTheme } from '@/components/theme-provider-custom';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function SiteFooter() {
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <footer className="border-t border-border/60 bg-secondary/40">
@@ -16,7 +16,7 @@ export function SiteFooter() {
           <Link href="/" className="flex items-center gap-3 font-semibold">
             <div className="relative size-24">
               <Image
-                src={isDark ? "/logo-dark.webp" : "/logo-light.png"}
+                src={isDark ? '/logo-dark.webp' : '/logo-light.png'}
                 alt="iVALT Logo"
                 fill
                 className="object-contain"
@@ -67,7 +67,10 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="https://ivalt.com/contact" className="hover:text-foreground">
+                <Link
+                  href="https://ivalt.com/contact"
+                  className="hover:text-foreground"
+                >
                   Contact
                 </Link>
               </li>
@@ -108,5 +111,5 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

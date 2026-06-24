@@ -1,62 +1,62 @@
-import { NextResponse } from "next/server"
-import { verifySchema } from "@/lib/validation"
-import { db, schema } from "@/lib/db"
-import { eq, and } from "drizzle-orm"
-import { triggerAuthRequest, mapIvaltStatus } from "@/lib/ivalt"
-import { sendAdminVerificationAlert } from "@/lib/email"
-import { simRequests } from "@/lib/sim-store"
+import { NextResponse } from 'next/server';
+import { verifySchema } from '@/lib/validation';
+import { db, schema } from '@/lib/db';
+import { eq, and } from 'drizzle-orm';
+import { triggerAuthRequest, mapIvaltStatus } from '@/lib/ivalt';
+import { sendAdminVerificationAlert } from '@/lib/email';
+import { simRequests } from '@/lib/sim-store';
 
 // Demo mode handler
 async function handleDemoMode(data: any) {
-  const { idConnection, countryCode, mobile } = data
-  
-  // Simulate request creation latency
-  await new Promise((r) => setTimeout(r, 400))
+  const { idConnection, countryCode, mobile } = data;
 
-  const id = `req_${Math.random().toString(36).slice(2, 10)}`
-  const now = Date.now()
+  // Simulate request creation latency
+  await new Promise(r => setTimeout(r, 400));
+
+  const id = `req_${Math.random().toString(36).slice(2, 10)}`;
+  const now = Date.now();
 
   // Decide final outcome for the demo
-  let finalStatus: "authenticated" | "failed" | "not_found" = "authenticated"
-  let finalCode = 200
-  
-  const NOT_REGISTERED_CODES = new Set(["MISSING01"])
+  let finalStatus: 'authenticated' | 'failed' | 'not_found' = 'authenticated';
+  let finalCode = 200;
+
+  const NOT_REGISTERED_CODES = new Set(['MISSING01']);
   if (NOT_REGISTERED_CODES.has(idConnection)) {
-    finalStatus = "not_found"
-    finalCode = 404
-  } else if (mobile.endsWith("0000")) {
-    finalStatus = "failed"
-    finalCode = 403
+    finalStatus = 'not_found';
+    finalCode = 404;
+  } else if (mobile.endsWith('0000')) {
+    finalStatus = 'failed';
+    finalCode = 403;
   }
 
   // Resolve after 4–7 seconds for a believable polling experience
-  const resolveAt = now + 4000 + Math.floor(Math.random() * 3000)
+  const resolveAt = now + 4000 + Math.floor(Math.random() * 3000);
 
   simRequests.set(id, {
     id,
     idConnection,
     countryCode,
     mobile,
-    status: "pending",
+    status: 'pending',
     ivaltStatusCode: 422,
     createdAt: now,
     resolveAt,
     finalStatus,
     finalCode,
-  })
+  });
 
   return {
     ok: true,
     id,
-    status: "initiated",
+    status: 'initiated',
     ivaltStatusCode: 422,
     message: "Push notification dispatched to user's iVALT mobile app",
-  }
+  };
 }
 
 // Production mode handler
 async function handleProductionMode(data: any, request: Request) {
-  const { idConnection, countryCode, mobile } = data
+  const { idConnection, countryCode, mobile } = data;
 
   // Validate IDCONNECTION against active customers
   const customers = await db
@@ -65,23 +65,24 @@ async function handleProductionMode(data: any, request: Request) {
     .where(
       and(
         eq(schema.customers.idConnection, idConnection),
-        eq(schema.customers.status, "active"),
-      ),
+        eq(schema.customers.status, 'active')
+      )
     )
-    .limit(1)
+    .limit(1);
 
   if (customers.length === 0) {
     return {
-      error: "IDCONNECTION not found or inactive",
-      status: "not_found",
-    }
+      error: 'IDCONNECTION not found or inactive',
+      status: 'not_found',
+    };
   }
 
   // Get request metadata
-  const ip = request.headers.get("x-forwarded-for") || 
-             request.headers.get("x-real-ip") || 
-             "unknown"
-  const userAgent = request.headers.get("user-agent") || "unknown"
+  const ip =
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+  const userAgent = request.headers.get('user-agent') || 'unknown';
 
   // Create ondemand request record
   const requestRecord = await db
@@ -90,31 +91,31 @@ async function handleProductionMode(data: any, request: Request) {
       countryCode,
       mobile,
       idConnection,
-      status: "initiated",
+      status: 'initiated',
       ipAddress: ip,
       userAgent,
     })
-    .returning()
+    .returning();
 
-  const requestId = requestRecord[0].id
+  const requestId = requestRecord[0].id;
 
   // Call iVALT API to trigger push notification
-  let ivaltResponse: any = null
-  let ivaltStatusCode: number | null = null
+  let ivaltResponse: any = null;
+  let ivaltStatusCode: number | null = null;
 
   try {
     const authRequest = await triggerAuthRequest({
       idConnection,
       countryCode,
       mobile,
-    })
-    ivaltStatusCode = 422 // pending
-    ivaltResponse = authRequest
+    });
+    ivaltStatusCode = 422; // pending
+    ivaltResponse = authRequest;
   } catch (error) {
-    console.error("iVALT API error:", error)
+    console.error('iVALT API error:', error);
     // Continue anyway - don't block the flow
-    ivaltStatusCode = null
-    ivaltResponse = { error: String(error) }
+    ivaltStatusCode = null;
+    ivaltResponse = { error: String(error) };
   }
 
   // Update request with iVALT response
@@ -122,63 +123,66 @@ async function handleProductionMode(data: any, request: Request) {
     .update(schema.ondemandRequests)
     .set({
       ivaltStatusCode,
-      ivaltResponse: process.env.DB_TYPE === "neon" ? ivaltResponse : JSON.stringify(ivaltResponse),
+      ivaltResponse:
+        process.env.DB_TYPE === 'neon'
+          ? ivaltResponse
+          : JSON.stringify(ivaltResponse),
     })
-    .where(eq(schema.ondemandRequests.id, requestId))
+    .where(eq(schema.ondemandRequests.id, requestId));
 
   // Send admin notification email (non-blocking)
   sendAdminVerificationAlert({
     idConnection,
     countryCode,
     mobile,
-    status: "initiated",
+    status: 'initiated',
     ivaltStatusCode: ivaltStatusCode || 0,
     requestId,
-  }).catch((error) => {
-    console.error("Failed to send admin verification alert email:", error)
-  })
+  }).catch(error => {
+    console.error('Failed to send admin verification alert email:', error);
+  });
 
   return {
     ok: true,
     id: requestId,
-    status: "initiated",
+    status: 'initiated',
     ivaltStatusCode: ivaltStatusCode || 422,
     message: "Push notification dispatched to user's iVALT mobile app",
-  }
+  };
 }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const parsed = verifySchema.safeParse(body)
+    const body = await request.json();
+    const parsed = verifySchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
         {
-          error: "Invalid verification payload",
+          error: 'Invalid verification payload',
           details: parsed.error.flatten().fieldErrors,
         },
-        { status: 400 },
-      )
+        { status: 400 }
+      );
     }
 
-    const data = parsed.data
-    const isDemoMode = process.env.DEMO_MODE === "true"
+    const data = parsed.data;
+    const isDemoMode = process.env.DEMO_MODE === 'true';
 
-    const result = isDemoMode 
+    const result = isDemoMode
       ? await handleDemoMode(data)
-      : await handleProductionMode(data, request)
+      : await handleProductionMode(data, request);
 
-    if ("error" in result) {
-      return NextResponse.json(result, { status: 404 })
+    if ('error' in result) {
+      return NextResponse.json(result, { status: 404 });
     }
 
-    return NextResponse.json(result, { status: 202 })
+    return NextResponse.json(result, { status: 202 });
   } catch (error) {
-    console.error("Verification error:", error)
+    console.error('Verification error:', error);
     return NextResponse.json(
-      { error: "Failed to initiate verification" },
-      { status: 500 },
-    )
+      { error: 'Failed to initiate verification' },
+      { status: 500 }
+    );
   }
 }

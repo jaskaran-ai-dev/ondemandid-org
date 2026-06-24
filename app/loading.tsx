@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from '@/components/ui/skeleton';
 
 function SkeletonCard() {
   return (
@@ -8,7 +8,7 @@ function SkeletonCard() {
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-5/6" />
     </div>
-  )
+  );
 }
 
 function SkeletonStep() {
@@ -22,7 +22,7 @@ function SkeletonStep() {
       <Skeleton className="h-4 w-full" />
       <Skeleton className="h-4 w-5/6" />
     </div>
-  )
+  );
 }
 
 export default function Loading() {
@@ -126,5 +126,5 @@ export default function Loading() {
         </div>
       </section>
     </div>
-  )
+  );
 }

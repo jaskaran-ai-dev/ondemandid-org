@@ -1,31 +1,31 @@
-"use client"
+'use client';
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, ScanFace } from "lucide-react"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { CodeIcon, PhoneCall } from "@hugeicons/core-free-icons"
-import { verifySchema, type VerifyValues } from "@/lib/validation"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { PhoneInput } from "@/components/ui/phone-input"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, ScanFace } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CodeIcon, PhoneCall } from '@hugeicons/core-free-icons';
+import { verifySchema, type VerifyValues } from '@/lib/validation';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 type Props = {
-  onSubmit: (values: VerifyValues) => Promise<void>
-  submitting?: boolean
-}
+  onSubmit: (values: VerifyValues) => Promise<void>;
+  submitting?: boolean;
+};
 
 export function VerificationForm({ onSubmit, submitting }: Props) {
   const form = useForm<VerifyValues>({
     resolver: zodResolver(verifySchema),
     defaultValues: {
-      idConnection: "",
-      countryCode: "+1",
-      mobile: "",
+      idConnection: '',
+      countryCode: '+1',
+      mobile: '',
     },
-    mode: "onTouched",
-  })
+    mode: 'onTouched',
+  });
 
   const {
     register,
@@ -33,10 +33,10 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
     setValue,
     watch,
     formState: { errors },
-  } = form
+  } = form;
 
-  const countryCode = watch("countryCode")
-  const mobile = watch("mobile")
+  const countryCode = watch('countryCode');
+  const mobile = watch('mobile');
 
   return (
     <form
@@ -58,9 +58,9 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
           disabled={submitting}
           className="font-mono uppercase tracking-wider"
           leftIcon={<HugeiconsIcon icon={CodeIcon} size={18} />}
-          {...register("idConnection", {
-            onChange: (e) => {
-              e.target.value = e.target.value.toUpperCase()
+          {...register('idConnection', {
+            onChange: e => {
+              e.target.value = e.target.value.toUpperCase();
             },
           })}
         />
@@ -83,14 +83,14 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
           id="mobile"
           countryCode={countryCode}
           mobile={mobile}
-          onCountryCodeChange={(code) =>
-            setValue("countryCode", code, {
+          onCountryCodeChange={code =>
+            setValue('countryCode', code, {
               shouldValidate: true,
               shouldDirty: true,
             })
           }
-          onMobileChange={(m) =>
-            setValue("mobile", m, {
+          onMobileChange={m =>
+            setValue('mobile', m, {
               shouldValidate: true,
               shouldDirty: true,
             })
@@ -133,5 +133,5 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
         )}
       </Button>
     </form>
-  )
+  );
 }

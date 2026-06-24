@@ -1,27 +1,27 @@
-import { Reveal } from "@/components/reveal"
+import { Reveal } from '@/components/reveal';
 
 const METRICS = [
   {
-    value: "99.9%",
-    label: "Biometric accuracy",
-    description: "False acceptance rate of 1 in 100,000+",
+    value: '99.9%',
+    label: 'Biometric accuracy',
+    description: 'False acceptance rate of 1 in 100,000+',
   },
   {
-    value: "<2s",
-    label: "Median verification",
-    description: "From request initiation to biometric response",
+    value: '<2s',
+    label: 'Median verification',
+    description: 'From request initiation to biometric response',
   },
   {
-    value: "0",
-    label: "Passwords required",
-    description: "Eliminate phishing, reuse, and credential leaks",
+    value: '0',
+    label: 'Passwords required',
+    description: 'Eliminate phishing, reuse, and credential leaks',
   },
   {
-    value: "SOC 2",
-    label: "Compliance ready",
-    description: "Audit trail with IP, device, and timestamps",
+    value: 'SOC 2',
+    label: 'Compliance ready',
+    description: 'Audit trail with IP, device, and timestamps',
   },
-]
+];
 
 export function TrustMetrics() {
   return (
@@ -45,5 +45,5 @@ export function TrustMetrics() {
         ))}
       </div>
     </section>
-  )
+  );
 }

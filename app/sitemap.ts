@@ -1,26 +1,27 @@
-import type { MetadataRoute } from "next"
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://ondemandid.ivalt.com"
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? 'https://ondemandid.ivalt.com';
 
   return [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
       url: `${baseUrl}/signup`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/ondemand-id`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.8,
     },
-  ]
+  ];
 }

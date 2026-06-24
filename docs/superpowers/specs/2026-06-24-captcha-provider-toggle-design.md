@@ -37,32 +37,32 @@ CAPTCHA_PROVIDER=recaptcha   # uses Google reCAPTCHA v2 Checkbox
 
 ### New Files
 
-| File | Purpose |
-|------|---------|
-| `lib/captcha/index.ts` | Provider detection, site key lookup, server-side verification |
-| `components/ui/captcha-widget.tsx` | Unified client component that renders the active provider |
-| `components/ui/recaptcha.tsx` | Google reCAPTCHA v2 Checkbox widget component |
+| File                               | Purpose                                                       |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `lib/captcha/index.ts`             | Provider detection, site key lookup, server-side verification |
+| `components/ui/captcha-widget.tsx` | Unified client component that renders the active provider     |
+| `components/ui/recaptcha.tsx`      | Google reCAPTCHA v2 Checkbox widget component                 |
 
 ### Modified Files
 
-| File | Changes |
-|------|---------|
-| `lib/validation.ts` | Rename `turnstileToken` → `captchaToken` |
-| `components/signup/signup-form.tsx` | Replace `Turnstile` import/usage with `CaptchaWidget` |
-| `app/api/signup/route.ts` | Use `verifyCaptchaToken()` instead of `verifyTurnstileToken()` |
-| `lib/security.ts` | Remove `verifyTurnstileToken()` (moved to `lib/captcha/`) |
-| `.env.example` | Add `CAPTCHA_PROVIDER`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` |
+| File                                | Changes                                                                          |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `lib/validation.ts`                 | Rename `turnstileToken` → `captchaToken`                                         |
+| `components/signup/signup-form.tsx` | Replace `Turnstile` import/usage with `CaptchaWidget`                            |
+| `app/api/signup/route.ts`           | Use `verifyCaptchaToken()` instead of `verifyTurnstileToken()`                   |
+| `lib/security.ts`                   | Remove `verifyTurnstileToken()` (moved to `lib/captcha/`)                        |
+| `.env.example`                      | Add `CAPTCHA_PROVIDER`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` |
 
 ### File Details
 
 #### `lib/captcha/index.ts`
 
 ```ts
-export type CaptchaProvider = "turnstile" | "recaptcha"
+export type CaptchaProvider = 'turnstile' | 'recaptcha';
 
-export function getCaptchaProvider(): CaptchaProvider
-export function getCaptchaSiteKey(): string | undefined
-export async function verifyCaptchaToken(token: string): Promise<boolean>
+export function getCaptchaProvider(): CaptchaProvider;
+export function getCaptchaSiteKey(): string | undefined;
+export async function verifyCaptchaToken(token: string): Promise<boolean>;
 ```
 
 - `getCaptchaProvider()` reads `process.env.CAPTCHA_PROVIDER`, defaults to `"turnstile"`
@@ -72,6 +72,7 @@ export async function verifyCaptchaToken(token: string): Promise<boolean>
 #### `CaptchaWidget` (`components/ui/captcha-widget.tsx`)
 
 Client component that:
+
 - Reads `process.env.NEXT_PUBLIC_CAPTCHA_PROVIDER` to determine which widget to render
 - Falls back to `Turnstile` if no provider is set (backward compatible)
 - Shows error state if the chosen provider's site key is missing
@@ -80,6 +81,7 @@ Client component that:
 #### `ReCaptcha` (`components/ui/recaptcha.tsx`)
 
 Client component for Google reCAPTCHA v2 Checkbox:
+
 - Loads `https://www.google.com/recaptcha/api.js` dynamically
 - Renders the reCAPTCHA widget in a container div
 - Provides `onVerify`, `onError`, `onExpire` callbacks

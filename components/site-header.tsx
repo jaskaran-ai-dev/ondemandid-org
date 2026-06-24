@@ -1,46 +1,46 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { useTheme } from "@/components/theme-provider-custom"
-import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { useTheme } from '@/components/theme-provider-custom';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 function SmoothScrollLink({
   href,
   children,
   className,
 }: {
-  href: string
-  children: React.ReactNode
-  className?: string
+  href: string;
+  children: React.ReactNode;
+  className?: string;
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (href.startsWith("/#") && pathname === "/") {
-      e.preventDefault()
-      const targetId = href.replace("/#", "")
-      const element = document.getElementById(targetId)
+    if (href.startsWith('/#') && pathname === '/') {
+      e.preventDefault();
+      const targetId = href.replace('/#', '');
+      const element = document.getElementById(targetId);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // Update URL without page reload
-        window.history.pushState(null, "", href)
+        window.history.pushState(null, '', href);
       }
     }
-  }
+  };
 
   return (
     <Link href={href} onClick={handleClick} className={className}>
       {children}
     </Link>
-  )
+  );
 }
 
 export function SiteHeader() {
-  const { theme, resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === "dark"
+  const { theme, resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
@@ -48,7 +48,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-3 font-semibold ">
           <div className="relative size-24">
             <Image
-              src={isDark ? "/logo-dark.webp" : "/logo-light.png"}
+              src={isDark ? '/logo-dark.webp' : '/logo-light.png'}
               alt="iVALT Logo"
               fill
               className="object-contain"
@@ -60,7 +60,10 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm md:flex" aria-label="Primary">
+        <nav
+          className="hidden items-center gap-6 text-sm md:flex"
+          aria-label="Primary"
+        >
           <SmoothScrollLink
             href="/#features"
             className="text-muted-foreground transition-colors hover:text-foreground"
@@ -89,7 +92,12 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="hidden sm:inline-flex"
+          >
             <Link href="/ondemand-id">Verify ID</Link>
           </Button>
           <Button asChild size="sm">
@@ -98,5 +106,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

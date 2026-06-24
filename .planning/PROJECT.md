@@ -49,13 +49,13 @@ Enterprises can verify anyone's identity in under 5 seconds without passwords, u
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Custom theme provider (not next-themes) | Avoids script tag injection errors in Next.js 16 | — Pending |
-| Dual database schemas (Postgres + SQLite) | Production uses Neon, local dev uses SQLite | — Pending |
-| Demo mode toggle | Enables frontend dev without iVALT API dependency | — Pending |
-| React Query for API calls | Handles polling, caching, and mutation state | — Pending |
-| Zod validation on both client and server | Defense in depth for all API inputs | — Pending |
+| Decision                                  | Rationale                                         | Outcome   |
+| ----------------------------------------- | ------------------------------------------------- | --------- |
+| Custom theme provider (not next-themes)   | Avoids script tag injection errors in Next.js 16  | — Pending |
+| Dual database schemas (Postgres + SQLite) | Production uses Neon, local dev uses SQLite       | — Pending |
+| Demo mode toggle                          | Enables frontend dev without iVALT API dependency | — Pending |
+| React Query for API calls                 | Handles polling, caching, and mutation state      | — Pending |
+| Zod validation on both client and server  | Defense in depth for all API inputs               | — Pending |
 
 ---
 
@@ -64,6 +64,7 @@ Enterprises can verify anyone's identity in under 5 seconds without passwords, u
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
+
 1. Requirements invalidated? → Move to Out of Scope with reason
 2. Requirements validated? → Move to Validated with phase reference
 3. New requirements emerged? → Add to Active
@@ -71,10 +72,12 @@ This document evolves at phase transitions and milestone boundaries.
 5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
+
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 after initialization*
+
+_Last updated: 2026-05-12 after initialization_

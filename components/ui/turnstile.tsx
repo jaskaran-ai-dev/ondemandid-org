@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface TurnstileProps {
-  siteKey?: string
-  onVerify: (token: string) => void
-  onError?: () => void
-  onExpire?: () => void
-  theme?: "light" | "dark" | "auto"
-  className?: string
+  siteKey?: string;
+  onVerify: (token: string) => void;
+  onError?: () => void;
+  onExpire?: () => void;
+  theme?: 'light' | 'dark' | 'auto';
+  className?: string;
 }
 
 /**
@@ -24,123 +24,126 @@ export function Turnstile({
   onVerify,
   onError,
   onExpire,
-  theme = "auto",
+  theme = 'auto',
   className,
 }: TurnstileProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const widgetIdRef = useRef<string | null>(null)
-  const [scriptLoaded, setScriptLoaded] = useState(false)
-  const [scriptError, setScriptError] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
 
-  const key = siteKey || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+  const key = siteKey || process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   // Load Turnstile script
   useEffect(() => {
     if (!key) {
-      console.warn("Turnstile site key not configured — CAPTCHA disabled")
-      return
+      console.warn('Turnstile site key not configured — CAPTCHA disabled');
+      return;
     }
 
     if (window.turnstile) {
-      setScriptLoaded(true)
-      return
+      setScriptLoaded(true);
+      return;
     }
 
-    if (document.getElementById("turnstile-script")) {
+    if (document.getElementById('turnstile-script')) {
       // Script tag exists but may not be loaded yet
       const checkReady = () => {
         if (window.turnstile) {
-          setScriptLoaded(true)
+          setScriptLoaded(true);
         } else {
-          setTimeout(checkReady, 100)
+          setTimeout(checkReady, 100);
         }
-      }
-      checkReady()
-      return
+      };
+      checkReady();
+      return;
     }
 
-    const script = document.createElement("script")
-    script.id = "turnstile-script"
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"
-    script.async = true
-    script.defer = true
-    script.onload = () => setScriptLoaded(true)
-    script.onerror = () => setScriptError(true)
-    document.body.appendChild(script)
-  }, [key])
+    const script = document.createElement('script');
+    script.id = 'turnstile-script';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setScriptLoaded(true);
+    script.onerror = () => setScriptError(true);
+    document.body.appendChild(script);
+  }, [key]);
 
   // Render widget once script is loaded
   const renderWidget = useCallback(() => {
-    if (!containerRef.current || !window.turnstile || !key) return
+    if (!containerRef.current || !window.turnstile || !key) return;
 
     // Remove existing widget if any
     if (widgetIdRef.current) {
       try {
-        window.turnstile.remove(widgetIdRef.current)
+        window.turnstile.remove(widgetIdRef.current);
       } catch {
         // Ignore removal errors
       }
-      widgetIdRef.current = null
+      widgetIdRef.current = null;
     }
 
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: key,
       theme,
       callback: onVerify,
-      "error-callback": onError,
-      "expired-callback": onExpire,
-    })
-  }, [key, theme, onVerify, onError, onExpire])
+      'error-callback': onError,
+      'expired-callback': onExpire,
+    });
+  }, [key, theme, onVerify, onError, onExpire]);
 
   useEffect(() => {
     if (scriptLoaded) {
-      renderWidget()
+      renderWidget();
     }
-  }, [scriptLoaded, renderWidget])
+  }, [scriptLoaded, renderWidget]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (widgetIdRef.current && window.turnstile) {
         try {
-          window.turnstile.remove(widgetIdRef.current)
+          window.turnstile.remove(widgetIdRef.current);
         } catch {
           // Ignore
         }
       }
-    }
-  }, [])
+    };
+  }, []);
 
   if (!key) {
-    return null
+    return null;
   }
 
   if (scriptError) {
     return (
-      <div className={`text-xs text-destructive ${className ?? ""}`}>
+      <div className={`text-xs text-destructive ${className ?? ''}`}>
         CAPTCHA failed to load. Please refresh the page.
       </div>
-    )
+    );
   }
 
   return (
     <div
       ref={containerRef}
-      className={`min-h-[65px] ${className ?? ""}`}
+      className={`min-h-[65px] ${className ?? ''}`}
       aria-label="Security verification"
       role="region"
     />
-  )
+  );
 }
 
 // Global type augmentation for Turnstile
 declare global {
   interface Window {
     turnstile?: {
-      render: (container: HTMLElement, options: Record<string, unknown>) => string
-      remove: (widgetId: string) => void
-      reset: (widgetId: string) => void
-      getResponse: (widgetId: string) => string | undefined
-    }
+      render: (
+        container: HTMLElement,
+        options: Record<string, unknown>
+      ) => string;
+      remove: (widgetId: string) => void;
+      reset: (widgetId: string) => void;
+      getResponse: (widgetId: string) => string | undefined;
+    };
   }
 }
