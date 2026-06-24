@@ -28,12 +28,19 @@ export const adminCustomersList = authedProcedure
     z.object({
       status: z.string().optional(),
       search: z.string().optional(),
+      page: z.number().optional().default(1),
+      pageSize: z.number().optional().default(10),
     })
   )
   .handler(async ({ input }) => {
     try {
-      const customers = await getCustomers(input.status, input.search);
-      return { customers };
+      const result = await getCustomers(
+        input.status,
+        input.search,
+        input.page,
+        input.pageSize
+      );
+      return result;
     } catch (error) {
       console.error('Admin customers list error:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
@@ -67,12 +74,18 @@ export const adminRequestsList = authedProcedure
   .input(
     z.object({
       status: z.string().optional(),
+      page: z.number().optional().default(1),
+      pageSize: z.number().optional().default(10),
     })
   )
   .handler(async ({ input }) => {
     try {
-      const requests = await getRequests(input.status);
-      return { requests };
+      const result = await getRequests(
+        input.status,
+        input.page,
+        input.pageSize
+      );
+      return result;
     } catch (error) {
       console.error('Admin requests list error:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {

@@ -4,9 +4,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orpc } from '@/lib/orpc/client';
 import { toast } from 'sonner';
 
-export function useAdminCustomers(status?: string, search?: string) {
+export function useAdminCustomers(
+  status?: string,
+  search?: string,
+  page: number = 1
+) {
   return useQuery(
-    orpc.customers.list.queryOptions({ input: { status, search } })
+    orpc.customers.list.queryOptions({ input: { status, search, page } })
   );
 }
 

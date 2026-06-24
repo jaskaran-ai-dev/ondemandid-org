@@ -60,19 +60,25 @@ function formatDate(ts: number) {
   });
 }
 
+const PAGE_SIZE = 10;
+
 export function CustomersTable() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
 
   const { data, isLoading } = useAdminCustomers(
     statusFilter !== 'all' ? statusFilter : undefined,
-    search || undefined
+    search || undefined,
+    page
   );
 
   const customers: Customer[] = useMemo(() => data?.customers ?? [], [data]);
+  const total: number = useMemo(() => data?.total ?? 0, [data]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <>
@@ -83,11 +89,20 @@ export function CustomersTable() {
           <Input
             placeholder="Search by company, contact, email, or IDCONNECTION..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="pl-10"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select
+          value={statusFilter}
+          onValueChange={v => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
@@ -183,6 +198,34 @@ export function CustomersTable() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {!isLoading && customers.length > 0 && (
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <p className="text-sm text-muted-foreground">
+            Showing {(page - 1) * PAGE_SIZE + 1}&ndash;
+            {Math.min(page * PAGE_SIZE, total)} of {total}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Edit dialog */}
       {selectedCustomer && (

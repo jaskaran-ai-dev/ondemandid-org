@@ -115,43 +115,53 @@ const demoRequests: DemoRequest[] = [
 ];
 
 export async function getRequests(
-  status?: string | null
-): Promise<VerificationRequest[]> {
+  status?: string | null,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ requests: VerificationRequest[]; total: number }> {
   const isDemo = process.env.DEMO_MODE === 'true';
 
+  let filtered: VerificationRequest[];
+
   if (isDemo) {
-    let filtered = [...demoRequests];
+    let list = [...demoRequests] as VerificationRequest[];
     if (status && status !== 'all') {
       if (status === 'pending') {
-        filtered = filtered.filter(
+        list = list.filter(
           r => r.status === 'pending' || r.status === 'initiated'
         );
       } else {
-        filtered = filtered.filter(r => r.status === status);
+        list = list.filter(r => r.status === status);
       }
     }
-    return filtered;
-  }
+    filtered = list;
+  } else {
+    const allRequests = await db
+      .select()
+      .from(schema.ondemandRequests)
+      .orderBy(desc(schema.ondemandRequests.createdAt));
 
-  const allRequests = await db
-    .select()
-    .from(schema.ondemandRequests)
-    .orderBy(desc(schema.ondemandRequests.createdAt));
-
-  let filtered = allRequests;
-  if (status && status !== 'all') {
-    if (status === 'pending') {
-      filtered = filtered.filter(
-        (r: any) => r.status === 'pending' || r.status === 'initiated'
-      );
-    } else {
-      filtered = filtered.filter((r: any) => r.status === status);
+    let list = allRequests;
+    if (status && status !== 'all') {
+      if (status === 'pending') {
+        list = list.filter(
+          (r: any) => r.status === 'pending' || r.status === 'initiated'
+        );
+      } else {
+        list = list.filter((r: any) => r.status === status);
+      }
     }
+
+    filtered = list.map(r => ({
+      ...r,
+      createdAt: toTimestamp((r as any).createdAt) ?? 0,
+      completedAt: toTimestamp((r as any).completedAt),
+    })) as VerificationRequest[];
   }
 
-  return filtered.map(r => ({
-    ...r,
-    createdAt: toTimestamp((r as any).createdAt) ?? 0,
-    completedAt: toTimestamp((r as any).completedAt),
-  })) as VerificationRequest[];
+  const total = filtered.length;
+  const offset = (page - 1) * pageSize;
+  const requests = filtered.slice(offset, offset + pageSize);
+
+  return { requests, total };
 }

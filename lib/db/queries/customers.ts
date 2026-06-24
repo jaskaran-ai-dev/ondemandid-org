@@ -106,17 +106,21 @@ const demoCustomers: DemoCustomer[] = [
 
 export async function getCustomers(
   status?: string | null,
-  search?: string | null
-): Promise<Customer[]> {
+  search?: string | null,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<{ customers: Customer[]; total: number }> {
   const isDemo = process.env.DEMO_MODE === 'true';
 
+  let filtered: Customer[];
+
   if (isDemo) {
-    let filtered = [...demoCustomers];
+    let list = [...demoCustomers] as Customer[];
     if (status && status !== 'all')
-      filtered = filtered.filter(c => c.status === status);
+      list = list.filter(c => c.status === status);
     if (search) {
       const q = search.toLowerCase();
-      filtered = filtered.filter(
+      list = list.filter(
         c =>
           c.companyName.toLowerCase().includes(q) ||
           c.contactName.toLowerCase().includes(q) ||
@@ -124,32 +128,38 @@ export async function getCustomers(
           (c.idConnection || '').toLowerCase().includes(q)
       );
     }
-    return filtered;
+    filtered = list;
+  } else {
+    const allCustomers = await db
+      .select()
+      .from(schema.customers)
+      .orderBy(desc(schema.customers.createdAt));
+
+    let list = allCustomers;
+    if (status && status !== 'all')
+      list = list.filter((c: any) => c.status === status);
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (c: any) =>
+          c.companyName.toLowerCase().includes(q) ||
+          c.contactName.toLowerCase().includes(q) ||
+          c.email.toLowerCase().includes(q) ||
+          (c.idConnection || '').toLowerCase().includes(q)
+      );
+    }
+
+    filtered = list.map(c => ({
+      ...c,
+      createdAt: toTimestamp((c as any).createdAt),
+    })) as Customer[];
   }
 
-  const allCustomers = await db
-    .select()
-    .from(schema.customers)
-    .orderBy(desc(schema.customers.createdAt));
+  const total = filtered.length;
+  const offset = (page - 1) * pageSize;
+  const customers = filtered.slice(offset, offset + pageSize);
 
-  let filtered = allCustomers;
-  if (status && status !== 'all')
-    filtered = filtered.filter((c: any) => c.status === status);
-  if (search) {
-    const q = search.toLowerCase();
-    filtered = filtered.filter(
-      (c: any) =>
-        c.companyName.toLowerCase().includes(q) ||
-        c.contactName.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        (c.idConnection || '').toLowerCase().includes(q)
-    );
-  }
-
-  return filtered.map(c => ({
-    ...c,
-    createdAt: toTimestamp((c as any).createdAt),
-  })) as Customer[];
+  return { customers, total };
 }
 
 export async function updateCustomer(

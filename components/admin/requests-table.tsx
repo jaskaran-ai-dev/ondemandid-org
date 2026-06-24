@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
@@ -70,15 +71,26 @@ function formatDuration(start: number, end: number | null) {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
+const PAGE_SIZE = 10;
+
 export function AdminRequests() {
   const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useAdminRequests(
-    statusFilter !== 'all' ? statusFilter : undefined
+    statusFilter !== 'all' ? statusFilter : undefined,
+    page
   );
 
-  const requests: VerificationRequest[] =
-    (data as { requests?: VerificationRequest[] })?.requests ?? [];
+  const requests: VerificationRequest[] = useMemo(
+    () => (data as { requests?: VerificationRequest[] })?.requests ?? [],
+    [data]
+  );
+  const total: number = useMemo(
+    () => (data as { total?: number })?.total ?? 0,
+    [data]
+  );
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const summary = {
     authenticated: requests.filter(r => r.status === 'authenticated').length,
@@ -136,7 +148,13 @@ export function AdminRequests() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select
+          value={statusFilter}
+          onValueChange={v => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
@@ -216,6 +234,34 @@ export function AdminRequests() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {!isLoading && requests.length > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing {(page - 1) * PAGE_SIZE + 1}&ndash;
+            {Math.min(page * PAGE_SIZE, total)} of {total}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
