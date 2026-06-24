@@ -36,7 +36,7 @@ async function handleDemoMode(id: string) {
       id: r.id,
       status: r.status,
       ivaltStatusCode: r.ivaltStatusCode,
-      completedAt: r.completedAt,
+      completedAt: new Date(r.completedAt).toISOString(),
     }
   }
 
@@ -44,6 +44,7 @@ async function handleDemoMode(id: string) {
     id: r.id,
     status: "pending",
     ivaltStatusCode: 422,
+    completedAt: undefined,
   }
 }
 
@@ -62,6 +63,13 @@ async function handleProductionMode(id: string) {
 
   const request = requests[0]
 
+  // Log status check
+  console.log("[Status API] Production mode check:", {
+    requestId: id,
+    currentStatus: request.status,
+    ivaltStatusCode: request.ivaltStatusCode,
+  })
+
   // If already terminal (authenticated, failed, not_found, error), return as-is
   if (
     request.status === "authenticated" ||
@@ -69,21 +77,46 @@ async function handleProductionMode(id: string) {
     request.status === "not_found" ||
     request.status === "error"
   ) {
+    // Ensure completedAt is a string
+    const completedAt = request.completedAt;
     return {
       id: request.id,
       status: request.status,
       ivaltStatusCode: request.ivaltStatusCode,
-      completedAt: request.completedAt,
+      completedAt: completedAt ? new Date(completedAt).toISOString() : undefined,
     }
   }
 
   // If pending or initiated, query iVALT API for latest status
   if (request.status === "pending" || request.status === "initiated") {
     try {
-      const authResult = await getAuthResult(id)
+      const authResult = await getAuthResult({
+        countryCode: request.countryCode,
+        mobile: request.mobile,
+      })
+      
+      // Log iVALT response
+      console.log("[Status API] iVALT response:", {
+        requestId: id,
+        response: authResult,
+      })
+      
+      // Parse iVALT response - handle both old and new response formats
+      let statusCode: number;
+      let isAuthenticated: boolean;
+      
+      if (authResult.data) {
+        // New response format: { data: { status: true, ... }, error: null }
+        isAuthenticated = authResult.data.status === true;
+        statusCode = isAuthenticated ? 200 : 422;
+      } else {
+        // Old response format: { statusCode: 200, ... }
+        statusCode = authResult.statusCode ?? 422;
+        isAuthenticated = statusCode === 200;
+      }
       
       // Map iVALT status code to internal status
-      const { status, ivaltStatusCode } = mapIvaltStatus(authResult.statusCode)
+      const { status, ivaltStatusCode } = mapIvaltStatus(statusCode)
 
       // Update database with latest status
       const updateData: any = {
@@ -94,7 +127,8 @@ async function handleProductionMode(id: string) {
 
       // If terminal, set completedAt
       if (status === "authenticated" || status === "failed" || status === "not_found") {
-        updateData.completedAt = new Date().toISOString()
+        const isSqlite = process.env.DB_TYPE === "sqlite"
+        updateData.completedAt = isSqlite ? new Date().toISOString() : new Date()
       }
 
       await db
@@ -102,12 +136,24 @@ async function handleProductionMode(id: string) {
         .set(updateData)
         .where(eq(schema.ondemandRequests.id, id))
 
-      return {
+      const completedAt = updateData.completedAt instanceof Date
+        ? updateData.completedAt.toISOString()
+        : updateData.completedAt
+
+      // Extract user details from iVALT response for authenticated requests
+      const details = authResult.data?.details || null
+
+      const result = {
         id: request.id,
         status,
         ivaltStatusCode,
-        completedAt: updateData.completedAt,
+        completedAt,
+        details,
       }
+
+      console.log("[Status API] Returning result:", result)
+
+      return result
     } catch (error) {
       console.error("iVALT status API error:", error)
       // Return current pending status on error
@@ -124,6 +170,7 @@ async function handleProductionMode(id: string) {
     id: request.id,
     status: request.status,
     ivaltStatusCode: request.ivaltStatusCode || 422,
+    completedAt: undefined,
   }
 }
 
