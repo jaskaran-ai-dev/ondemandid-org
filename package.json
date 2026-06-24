@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "db:seed": "bun lib/db/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1045.0",
@@ -81,6 +82,7 @@
     "@types/nodemailer": "^8.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.10",
     "postcss": "^8.5.14",
     "prettier": "^3.8.4",
     "tailwindcss": "^4.2.4",
