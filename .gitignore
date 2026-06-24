@@ -44,3 +44,6 @@ coverage/
 .vercel/
 *.tsbuildinfo
 local.db
+
+# CodeDB snapshot
+codedb.snapshot
