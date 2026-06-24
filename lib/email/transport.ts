@@ -17,6 +17,7 @@ async function createSesTransport(): Promise<nodemailer.Transporter> {
     },
   });
 
+  // Using SESv2 transport configuration for nodemailer
   return nodemailer.createTransport({
     SES: { ses: sesClient, aws: { SES: sesClient } },
   });
