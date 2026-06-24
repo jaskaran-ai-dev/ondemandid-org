@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { signupSchema } from "@/lib/validation"
 import { db, schema } from "@/lib/db"
 import { sendAdminSignupNotification, sendCustomerConfirmation } from "@/lib/email"
-import { checkRateLimit, verifyTurnstileToken, stripHtml } from "@/lib/security"
+import { checkRateLimit, stripHtml } from "@/lib/security"
+import { verifyCaptchaToken, getCaptchaProvider } from "@/lib/captcha"
 
 const MAX_BODY_SIZE = 256_000 // 256 KB
 const RATE_LIMIT_MAX = 5
@@ -112,16 +113,16 @@ export async function POST(request: Request) {
 
     const data = parsed.data
 
-    // Verify Turnstile CAPTCHA token
-    if (data.turnstileToken) {
-      const turnstileValid = await verifyTurnstileToken(data.turnstileToken)
-      if (!turnstileValid) {
+    // Verify CAPTCHA token (Turnstile or reCAPTCHA based on provider)
+    if (data.captchaToken) {
+      const captchaValid = await verifyCaptchaToken(data.captchaToken)
+      if (!captchaValid) {
         return NextResponse.json(
           { error: "Security verification failed. Please try again." },
           { status: 400 },
         )
       }
-    } else if (process.env.TURNSTILE_SECRET_KEY) {
+    } else if (getCaptchaProvider() === "recaptcha" ? process.env.RECAPTCHA_SECRET_KEY : process.env.TURNSTILE_SECRET_KEY) {
       // Secret key is configured but token is missing
       return NextResponse.json(
         { error: "Security verification required." },

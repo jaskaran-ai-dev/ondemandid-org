@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { PhoneInput } from "@/components/ui/phone-input"
-import { Turnstile } from "@/components/ui/turnstile"
+import { CaptchaWidget } from "@/components/ui/captcha-widget"
+import { isCaptchaConfigured } from "@/lib/captcha"
 import { useState } from "react"
 
 type Props = {
@@ -20,8 +21,8 @@ type Props = {
 }
 
 export function SignupForm({ onSubmit, submitting }: Props) {
-  const [turnstileToken, setTurnstileToken] = useState<string>("")
-  const [turnstileError, setTurnstileError] = useState<string>("")
+  const [captchaToken, setCaptchaToken] = useState<string>("")
+  const [captchaError, setCaptchaError] = useState<string>("")
 
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
@@ -33,7 +34,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
       mobile: "",
       initialUsers: 10,
       notes: "",
-      turnstileToken: "",
+      captchaToken: "",
     },
     mode: "onTouched",
   })
@@ -49,15 +50,15 @@ export function SignupForm({ onSubmit, submitting }: Props) {
   const countryCode = watch("countryCode")
   const mobile = watch("mobile")
 
-  const hasTurnstileKey = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+  const captchaConfigured = isCaptchaConfigured()
 
   const handleFormSubmit = handleSubmit(async (values) => {
-    if (hasTurnstileKey && !turnstileToken) {
-      setTurnstileError("Please complete the security verification above.")
+    if (captchaConfigured && !captchaToken) {
+      setCaptchaError("Please complete the security verification above.")
       return
     }
-    setTurnstileError("")
-    await onSubmit({ ...values, turnstileToken })
+    setCaptchaError("")
+    await onSubmit({ ...values, captchaToken })
   })
 
   return (
@@ -180,23 +181,23 @@ export function SignupForm({ onSubmit, submitting }: Props) {
         />
       </Field>
 
-      {hasTurnstileKey && (
+      {captchaConfigured && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="size-3.5" aria-hidden />
             <span>Security verification required</span>
           </div>
-          <Turnstile
+          <CaptchaWidget
             onVerify={(token) => {
-              setTurnstileToken(token)
-              setTurnstileError("")
+              setCaptchaToken(token)
+              setCaptchaError("")
             }}
-            onError={() => setTurnstileError("Security verification failed. Please try again.")}
-            onExpire={() => setTurnstileToken("")}
+            onError={() => setCaptchaError("Security verification failed. Please try again.")}
+            onExpire={() => setCaptchaToken("")}
           />
-          {turnstileError && (
+          {captchaError && (
             <p className="text-xs text-destructive" role="alert">
-              {turnstileError}
+              {captchaError}
             </p>
           )}
         </div>
@@ -209,7 +210,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
         </p>
         <Button
           type="submit"
-          disabled={submitting || (hasTurnstileKey && !turnstileToken)}
+          disabled={submitting || (captchaConfigured && !captchaToken)}
           className="w-full sm:w-auto"
         >
           {submitting ? (
