@@ -20,7 +20,9 @@ export function useAdminLoginStatus(requestId: string | null) {
   return useQuery({
     queryKey: ['admin-login-status', requestId],
     queryFn: async () => {
-      const res = await api.get(`/api/admin/login-status?requestId=${requestId}`);
+      const res = await api.get(
+        `/api/admin/login-status?requestId=${requestId}`
+      );
       return res.data;
     },
     enabled: !!requestId,

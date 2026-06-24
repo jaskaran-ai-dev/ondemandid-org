@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Card,
   CardHeader,
@@ -12,13 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ShieldCheck, Server, Key, Mail, Info } from 'lucide-react';
 
-function SettingsRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function SettingsRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-2">
       <span className="text-sm text-muted-foreground">{label}</span>
@@ -108,9 +100,7 @@ export default function AdminSettingsPage() {
             <Info className="size-5" />
             Admin Capabilities
           </CardTitle>
-          <CardDescription>
-            What you can manage from this panel
-          </CardDescription>
+          <CardDescription>What you can manage from this panel</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2">

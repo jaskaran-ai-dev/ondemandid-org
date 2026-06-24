@@ -12,28 +12,33 @@ const customerUpdateSchema = z.object({
   notes: z.string().max(2000).optional(),
 });
 
-export const adminStats = authedProcedure
-  .handler(async () => {
-    try {
-      return await getDashboardStats();
-    } catch (error) {
-      console.error('Admin stats error:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to fetch stats' });
-    }
-  });
+export const adminStats = authedProcedure.handler(async () => {
+  try {
+    return await getDashboardStats();
+  } catch (error) {
+    console.error('Admin stats error:', error);
+    throw new ORPCError('INTERNAL_SERVER_ERROR', {
+      message: 'Failed to fetch stats',
+    });
+  }
+});
 
 export const adminCustomersList = authedProcedure
-  .input(z.object({
-    status: z.string().optional(),
-    search: z.string().optional(),
-  }))
+  .input(
+    z.object({
+      status: z.string().optional(),
+      search: z.string().optional(),
+    })
+  )
   .handler(async ({ input }) => {
     try {
       const customers = await getCustomers(input.status, input.search);
       return { customers };
     } catch (error) {
       console.error('Admin customers list error:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to fetch customers' });
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to fetch customers',
+      });
     }
   });
 
@@ -52,21 +57,27 @@ export const adminCustomerUpdate = authedProcedure
         throw new ORPCError('NOT_FOUND', { message: 'Customer not found' });
       }
       console.error('Admin customer update error:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to update customer' });
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to update customer',
+      });
     }
   });
 
 export const adminRequestsList = authedProcedure
-  .input(z.object({
-    status: z.string().optional(),
-  }))
+  .input(
+    z.object({
+      status: z.string().optional(),
+    })
+  )
   .handler(async ({ input }) => {
     try {
       const requests = await getRequests(input.status);
       return { requests };
     } catch (error) {
       console.error('Admin requests list error:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to fetch requests' });
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to fetch requests',
+      });
     }
   });
 

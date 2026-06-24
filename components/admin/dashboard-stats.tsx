@@ -41,7 +41,9 @@ function StatCard({
           <p className="text-3xl font-bold tracking-tight">{value}</p>
           <p className="text-xs text-muted-foreground">{description}</p>
         </div>
-        <div className={`flex size-12 items-center justify-center rounded-xl ${accent || 'bg-primary/10'}`}>
+        <div
+          className={`flex size-12 items-center justify-center rounded-xl ${accent || 'bg-primary/10'}`}
+        >
           <Icon className="size-6 text-primary" />
         </div>
       </CardContent>
@@ -146,9 +148,7 @@ export function AdminDashboard() {
               <CheckCircle2 className="size-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">
-                {data.authenticatedRequests}
-              </p>
+              <p className="text-2xl font-bold">{data.authenticatedRequests}</p>
               <p className="text-xs text-muted-foreground">Authenticated</p>
             </div>
           </CardContent>
@@ -201,9 +201,7 @@ export function AdminDashboard() {
                       <FileText className="size-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">
-                        {req.idConnection}
-                      </p>
+                      <p className="text-sm font-medium">{req.idConnection}</p>
                       <p className="text-xs text-muted-foreground">
                         {req.mobile} - {formatTime(req.createdAt)}
                       </p>

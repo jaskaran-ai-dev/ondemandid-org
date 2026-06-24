@@ -1,10 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -80,7 +77,8 @@ export function AdminRequests() {
     statusFilter !== 'all' ? statusFilter : undefined
   );
 
-  const requests: VerificationRequest[] = (data as { requests?: VerificationRequest[] })?.requests ?? [];
+  const requests: VerificationRequest[] =
+    (data as { requests?: VerificationRequest[] })?.requests ?? [];
 
   const summary = {
     authenticated: requests.filter(r => r.status === 'authenticated').length,

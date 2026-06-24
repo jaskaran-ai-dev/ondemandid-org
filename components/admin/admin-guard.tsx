@@ -6,7 +6,9 @@ import { Spinner } from '@/components/ui/spinner';
 
 export function AdminGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [state, setState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+  const [state, setState] = useState<
+    'loading' | 'authenticated' | 'unauthenticated'
+  >('loading');
 
   useEffect(() => {
     let cancelled = false;

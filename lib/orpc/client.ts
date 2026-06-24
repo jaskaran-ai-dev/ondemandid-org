@@ -7,9 +7,10 @@ import type { RouterClient } from '@orpc/server';
 import type { adminRouter } from './router';
 
 const link = new RPCLink({
-  url: typeof window !== 'undefined'
-    ? `${window.location.origin}/api/rpc`
-    : 'http://localhost:3000/api/rpc',
+  url:
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/rpc`
+      : 'http://localhost:3000/api/rpc',
   headers: async () => {
     if (typeof window !== 'undefined') {
       return {};
@@ -19,6 +20,7 @@ const link = new RPCLink({
   },
 });
 
-export const orpcClient: RouterClient<typeof adminRouter> = createORPCClient(link);
+export const orpcClient: RouterClient<typeof adminRouter> =
+  createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(orpcClient);

@@ -1,10 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,7 +63,9 @@ function formatDate(ts: number) {
 export function CustomersTable() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
 
   const { data, isLoading } = useAdminCustomers(
     statusFilter !== 'all' ? statusFilter : undefined,

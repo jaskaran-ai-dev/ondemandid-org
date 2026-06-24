@@ -24,7 +24,9 @@ const loginSchema = z.object({
 // In production, use Redis or a database table
 declare global {
   // eslint-disable-next-line no-var
-  var __adminLoginAttempts: Map<string, { mobile: string; createdAt: number }> | undefined;
+  var __adminLoginAttempts:
+    | Map<string, { mobile: string; createdAt: number }>
+    | undefined;
 }
 
 const loginAttempts: Map<string, { mobile: string; createdAt: number }> =

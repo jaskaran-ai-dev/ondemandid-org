@@ -59,9 +59,7 @@ export function AdminLoginForm() {
     if (!requestId) return;
 
     try {
-      const res = await fetch(
-        `/api/admin/login-status?requestId=${requestId}`
-      );
+      const res = await fetch(`/api/admin/login-status?requestId=${requestId}`);
       const data = await res.json();
 
       if (data.status === 'authenticated') {
@@ -106,9 +104,7 @@ export function AdminLoginForm() {
             <h1 className="font-serif text-2xl font-semibold tracking-tight">
               Admin Dashboard
             </h1>
-            <p className="text-sm text-muted-foreground">
-              iVALT OnDemand ID
-            </p>
+            <p className="text-sm text-muted-foreground">iVALT OnDemand ID</p>
           </div>
         </div>
 
@@ -168,7 +164,9 @@ export function AdminLoginForm() {
               <div className="flex flex-col items-center gap-4 text-center">
                 <Spinner className="size-8" />
                 <div>
-                  <p className="font-medium">Sending authentication request...</p>
+                  <p className="font-medium">
+                    Sending authentication request...
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     Contacting iVALT servers
                   </p>
@@ -187,9 +185,7 @@ export function AdminLoginForm() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="font-medium">
-                    Check your iVALT app
-                  </p>
+                  <p className="font-medium">Check your iVALT app</p>
                   <p className="text-sm text-muted-foreground max-w-xs">
                     A biometric authentication request has been sent to your
                     phone. Approve it with your fingerprint or face scan.
@@ -210,7 +206,9 @@ export function AdminLoginForm() {
                   <ShieldCheck className="size-10 text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <p className="font-medium text-lg">Authentication Successful</p>
+                  <p className="font-medium text-lg">
+                    Authentication Successful
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     Redirecting to dashboard...
                   </p>
