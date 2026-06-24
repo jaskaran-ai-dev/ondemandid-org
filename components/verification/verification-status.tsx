@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react';
 import {
   AlertCircle,
   CheckCircle2,
@@ -10,23 +10,23 @@ import {
   ShieldAlert,
   ShieldX,
   XCircle,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 export type VerificationState =
-  | { kind: "idle" }
-  | { kind: "submitting" }
+  | { kind: 'idle' }
+  | { kind: 'submitting' }
   | {
-      kind: "pending"
-      requestId: string
-      idConnection: string
-      countryCode: string
-      mobile: string
-      attempt: number
-      maxAttempts: number
-      ivaltStatusCode: number
-      startedAt: number
+      kind: 'pending';
+      requestId: string;
+      idConnection: string;
+      countryCode: string;
+      mobile: string;
+      attempt: number;
+      maxAttempts: number;
+      ivaltStatusCode: number;
+      startedAt: number;
     }
   | {
       kind: "authenticated"
@@ -35,20 +35,20 @@ export type VerificationState =
       durationMs: number
       details?: Record<string, unknown> | null
     }
-  | { kind: "failed"; requestId: string; ivaltStatusCode: number }
-  | { kind: "not_found"; ivaltStatusCode: number }
-  | { kind: "error"; message: string }
+  | { kind: 'failed'; requestId: string; ivaltStatusCode: number }
+  | { kind: 'not_found'; ivaltStatusCode: number }
+  | { kind: 'error'; message: string };
 
 type Props = {
-  state: VerificationState
-  onReset: () => void
-  onRetry: () => void
-}
+  state: VerificationState;
+  onReset: () => void;
+  onRetry: () => void;
+};
 
 export function VerificationStatus({ state, onReset, onRetry }: Props) {
-  if (state.kind === "idle") return null
+  if (state.kind === 'idle') return null;
 
-  if (state.kind === "submitting") {
+  if (state.kind === 'submitting') {
     return (
       <Frame
         tone="primary"
@@ -56,11 +56,11 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         title="Sending verification request"
         description="Validating IDCONNECTION and dispatching push notification…"
       />
-    )
+    );
   }
 
-  if (state.kind === "pending") {
-    return <PendingPanel state={state} onReset={onReset} />
+  if (state.kind === 'pending') {
+    return <PendingPanel state={state} onReset={onReset} />;
   }
 
   if (state.kind === "authenticated") {
@@ -100,10 +100,10 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         <DetailsRow label="iVALT status" value="200 · authenticated" mono />
         <Actions onReset={onReset} primaryLabel="Verify another user" />
       </Frame>
-    )
+    );
   }
 
-  if (state.kind === "failed") {
+  if (state.kind === 'failed') {
     return (
       <Frame
         tone="destructive"
@@ -117,16 +117,12 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
           value={`${state.ivaltStatusCode} · failed`}
           mono
         />
-        <Actions
-          onReset={onReset}
-          onRetry={onRetry}
-          primaryLabel="Try again"
-        />
+        <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Try again" />
       </Frame>
-    )
+    );
   }
 
-  if (state.kind === "not_found") {
+  if (state.kind === 'not_found') {
     return (
       <Frame
         tone="warning"
@@ -145,10 +141,10 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
           primaryLabel="Edit details"
         />
       </Frame>
-    )
+    );
   }
 
-  if (state.kind === "error") {
+  if (state.kind === 'error') {
     return (
       <Frame
         tone="destructive"
@@ -158,30 +154,30 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
       >
         <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Retry" />
       </Frame>
-    )
+    );
   }
 
-  return null
+  return null;
 }
 
 function PendingPanel({
   state,
   onReset,
 }: {
-  state: Extract<VerificationState, { kind: "pending" }>
-  onReset: () => void
+  state: Extract<VerificationState, { kind: 'pending' }>;
+  onReset: () => void;
 }) {
   // Live elapsed timer
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const i = setInterval(() => setNow(Date.now()), 250)
-    return () => clearInterval(i)
-  }, [])
-  const elapsed = Math.max(0, now - state.startedAt)
-  const seconds = Math.floor(elapsed / 1000)
-  const mm = String(Math.floor(seconds / 60)).padStart(2, "0")
-  const ss = String(seconds % 60).padStart(2, "0")
-  const progress = Math.min(100, (state.attempt / state.maxAttempts) * 100)
+    const i = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(i);
+  }, []);
+  const elapsed = Math.max(0, now - state.startedAt);
+  const seconds = Math.floor(elapsed / 1000);
+  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const ss = String(seconds % 60).padStart(2, '0');
+  const progress = Math.min(100, (state.attempt / state.maxAttempts) * 100);
 
   return (
     <div className="rounded-xl border border-primary/40 bg-primary/5 p-6 text-foreground">
@@ -219,7 +215,7 @@ function PendingPanel({
         <Progress value={progress} aria-label="Polling progress" />
         <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
           <span>
-            Polling /api/status/{state.requestId} every 2s ·{" "}
+            Polling /api/status/{state.requestId} every 2s ·{' '}
             <span className="font-mono text-foreground">
               {state.attempt}/{state.maxAttempts}
             </span>
@@ -255,10 +251,10 @@ function PendingPanel({
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
-type Tone = "primary" | "success" | "warning" | "destructive"
+type Tone = 'primary' | 'success' | 'warning' | 'destructive';
 
 function Frame({
   tone,
@@ -267,34 +263,31 @@ function Frame({
   description,
   children,
 }: {
-  tone: Tone
-  icon: React.ReactNode
-  title: string
-  description: string
-  children?: React.ReactNode
+  tone: Tone;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  children?: React.ReactNode;
 }) {
-  const toneClasses: Record<
-    Tone,
-    { container: string; iconWrap: string }
-  > = {
+  const toneClasses: Record<Tone, { container: string; iconWrap: string }> = {
     primary: {
-      container: "border-primary/40 bg-primary/5",
-      iconWrap: "bg-primary/10 text-primary",
+      container: 'border-primary/40 bg-primary/5',
+      iconWrap: 'bg-primary/10 text-primary',
     },
     success: {
-      container: "border-primary/40 bg-primary/5",
-      iconWrap: "bg-primary text-primary-foreground",
+      container: 'border-primary/40 bg-primary/5',
+      iconWrap: 'bg-primary text-primary-foreground',
     },
     warning: {
-      container: "border-accent/60 bg-accent/10",
-      iconWrap: "bg-accent text-accent-foreground",
+      container: 'border-accent/60 bg-accent/10',
+      iconWrap: 'bg-accent text-accent-foreground',
     },
     destructive: {
-      container: "border-destructive/40 bg-destructive/5",
-      iconWrap: "bg-destructive text-destructive-foreground",
+      container: 'border-destructive/40 bg-destructive/5',
+      iconWrap: 'bg-destructive text-destructive-foreground',
     },
-  }
-  const t = toneClasses[tone]
+  };
+  const t = toneClasses[tone];
   return (
     <div className={`rounded-xl border ${t.container} p-6`}>
       <div className="flex items-start gap-4">
@@ -317,7 +310,7 @@ function Frame({
         <div className="mt-5 flex flex-col gap-2">{children}</div>
       ) : null}
     </div>
-  )
+  );
 }
 
 function DetailsRow({
@@ -326,10 +319,10 @@ function DetailsRow({
   mono,
   boxed,
 }: {
-  label: string
-  value: string
-  mono?: boolean
-  boxed?: boolean
+  label: string;
+  value: string;
+  mono?: boolean;
+  boxed?: boolean;
 }) {
   if (boxed) {
     return (
@@ -339,26 +332,26 @@ function DetailsRow({
         </p>
         <p
           className={`mt-0.5 truncate text-xs font-semibold ${
-            mono ? "font-mono" : ""
+            mono ? 'font-mono' : ''
           }`}
         >
           {value}
         </p>
       </div>
-    )
+    );
   }
   return (
     <div className="flex items-baseline justify-between gap-2 border-b border-border/60 pb-2 text-sm last:border-b-0">
       <span className="text-muted-foreground">{label}</span>
       <span
         className={`truncate text-foreground ${
-          mono ? "font-mono text-xs" : ""
+          mono ? 'font-mono text-xs' : ''
         }`}
       >
         {value}
       </span>
     </div>
-  )
+  );
 }
 
 function Actions({
@@ -366,9 +359,9 @@ function Actions({
   onRetry,
   primaryLabel,
 }: {
-  onReset: () => void
-  onRetry?: () => void
-  primaryLabel: string
+  onReset: () => void;
+  onRetry?: () => void;
+  primaryLabel: string;
 }) {
   return (
     <div className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -382,5 +375,5 @@ function Actions({
         </Button>
       ) : null}
     </div>
-  )
+  );
 }

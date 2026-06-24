@@ -1,41 +1,41 @@
-import { CheckCircle2, Lock, ScrollText, ShieldCheck } from "lucide-react"
-import { Reveal } from "@/components/reveal"
+import { CheckCircle2, Lock, ScrollText, ShieldCheck } from 'lucide-react';
+import { Reveal } from '@/components/reveal';
 
 const PILLARS = [
   {
     icon: Lock,
-    title: "End-to-end encryption",
+    title: 'End-to-end encryption',
     description:
       "Every biometric request is encrypted in transit and at rest. Templates never leave the user's device.",
     points: [
-      "TLS 1.3 transport",
-      "AES-256 at rest",
-      "Per-tenant key isolation",
+      'TLS 1.3 transport',
+      'AES-256 at rest',
+      'Per-tenant key isolation',
     ],
   },
   {
     icon: ShieldCheck,
-    title: "Granular access control",
+    title: 'Granular access control',
     description:
-      "Only provisioned IDCONNECTION codes can trigger verifications. Inactive customers are blocked at the edge.",
+      'Only provisioned IDCONNECTION codes can trigger verifications. Inactive customers are blocked at the edge.',
     points: [
-      "Per-customer status enforcement",
-      "Phone-number scoped requests",
-      "Optional geo-fence + time window",
+      'Per-customer status enforcement',
+      'Phone-number scoped requests',
+      'Optional geo-fence + time window',
     ],
   },
   {
     icon: ScrollText,
-    title: "Compliance-ready audit",
+    title: 'Compliance-ready audit',
     description:
-      "Every attempt is recorded with IP, user agent, raw response, and timestamps for downstream reporting.",
+      'Every attempt is recorded with IP, user agent, raw response, and timestamps for downstream reporting.',
     points: [
-      "Tamper-evident audit log",
-      "SOC 2 / ISO 27001 ready",
-      "Exportable JSON & CSV",
+      'Tamper-evident audit log',
+      'SOC 2 / ISO 27001 ready',
+      'Exportable JSON & CSV',
     ],
   },
-]
+];
 
 export function Security() {
   return (
@@ -98,5 +98,5 @@ export function Security() {
         </div>
       </div>
     </section>
-  )
+  );
 }

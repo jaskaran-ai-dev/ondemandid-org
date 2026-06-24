@@ -84,56 +84,59 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
+| Feature                                 | Reason                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------- |
 | Document KYC / ID document verification | iVALT uses push-notification biometrics, not document scanning — different product category |
-| SSO / SAML / OIDC integration | Single admin + API key auth sufficient for v1; SSO is v2+ |
-| Billing / subscription management | Not required until customer self-service provisioning |
-| Multi-tenant self-service provisioning | Manual provisioning by iVALT admin is current operating model |
-| Native mobile app development | Identity verification happens through existing iVALT mobile app |
-| Real-time chat / support ticketing | Not core to identity verification product |
-| Performance / load testing suite | Add during stress-testing milestone, not initial hardening |
+| SSO / SAML / OIDC integration           | Single admin + API key auth sufficient for v1; SSO is v2+                                   |
+| Billing / subscription management       | Not required until customer self-service provisioning                                       |
+| Multi-tenant self-service provisioning  | Manual provisioning by iVALT admin is current operating model                               |
+| Native mobile app development           | Identity verification happens through existing iVALT mobile app                             |
+| Real-time chat / support ticketing      | Not core to identity verification product                                                   |
+| Performance / load testing suite        | Add during stress-testing milestone, not initial hardening                                  |
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| TEST-01 | Phase 1 | Pending |
-| TEST-02 | Phase 1 | Pending |
-| TEST-03 | Phase 1 | Pending |
-| TEST-04 | Phase 1 | Pending |
-| CI-01 | Phase 2 | Pending |
-| CI-02 | Phase 2 | Pending |
-| CI-03 | Phase 2 | Pending |
-| MON-01 | Phase 3 | Pending |
-| MON-02 | Phase 3 | Pending |
-| SEC-01 | Phase 4 | Pending |
-| SEC-02 | Phase 4 | Pending |
-| SEC-03 | Phase 4 | Pending |
-| LOG-01 | Phase 5 | Pending |
-| LOG-02 | Phase 5 | Pending |
-| LOG-03 | Phase 5 | Pending |
-| COMP-01 | Phase 6 | Pending |
-| COMP-02 | Phase 6 | Pending |
-| COMP-03 | Phase 6 | Pending |
-| COMP-04 | Phase 6 | Pending |
-| ADMIN-01 | Phase 7 | Pending |
-| ADMIN-02 | Phase 7 | Pending |
-| ADMIN-03 | Phase 7 | Pending |
-| ADMIN-04 | Phase 7 | Pending |
-| ADMIN-05 | Phase 7 | Pending |
-| SEC-04 | Phase 7 | Pending |
-| API-01 | Phase 8 | Pending |
-| API-02 | Phase 8 | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| TEST-01     | Phase 1 | Pending |
+| TEST-02     | Phase 1 | Pending |
+| TEST-03     | Phase 1 | Pending |
+| TEST-04     | Phase 1 | Pending |
+| CI-01       | Phase 2 | Pending |
+| CI-02       | Phase 2 | Pending |
+| CI-03       | Phase 2 | Pending |
+| MON-01      | Phase 3 | Pending |
+| MON-02      | Phase 3 | Pending |
+| SEC-01      | Phase 4 | Pending |
+| SEC-02      | Phase 4 | Pending |
+| SEC-03      | Phase 4 | Pending |
+| LOG-01      | Phase 5 | Pending |
+| LOG-02      | Phase 5 | Pending |
+| LOG-03      | Phase 5 | Pending |
+| COMP-01     | Phase 6 | Pending |
+| COMP-02     | Phase 6 | Pending |
+| COMP-03     | Phase 6 | Pending |
+| COMP-04     | Phase 6 | Pending |
+| ADMIN-01    | Phase 7 | Pending |
+| ADMIN-02    | Phase 7 | Pending |
+| ADMIN-03    | Phase 7 | Pending |
+| ADMIN-04    | Phase 7 | Pending |
+| ADMIN-05    | Phase 7 | Pending |
+| SEC-04      | Phase 7 | Pending |
+| API-01      | Phase 8 | Pending |
+| API-02      | Phase 8 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 27 total
 - Mapped to phases: 27
 - Unmapped: 0 ✓
 
 **Notes:**
+
 - API-03 (Webhook system) is marked "optional for v1" — not included in current roadmap. Add to v2 when push-based verification result notifications are needed.
 
 ---
-*Requirements defined: 2026-05-12*
-*Last updated: 2026-05-12 — updated phase mappings to 8-phase roadmap*
+
+_Requirements defined: 2026-05-12_
+_Last updated: 2026-05-12 — updated phase mappings to 8-phase roadmap_

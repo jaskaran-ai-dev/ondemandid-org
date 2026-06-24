@@ -1,33 +1,33 @@
-import Link from "next/link"
-import { ArrowRight, Building2, ScanFace, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Reveal } from "@/components/reveal"
+import Link from 'next/link';
+import { ArrowRight, Building2, ScanFace, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Reveal } from '@/components/reveal';
 
 const STEPS = [
   {
     icon: Building2,
-    step: "01",
-    title: "Register your company",
+    step: '01',
+    title: 'Register your company',
     description:
-      "Submit your organization details. iVALT provisions a unique IDCONNECTION code, your trial keys, and admin onboarding within one business day.",
-    cta: { label: "Start signup", href: "/signup" },
+      'Submit your organization details. iVALT provisions a unique IDCONNECTION code, your trial keys, and admin onboarding within one business day.',
+    cta: { label: 'Start signup', href: '/signup' },
   },
   {
     icon: Users,
-    step: "02",
-    title: "Onboard your users",
+    step: '02',
+    title: 'Onboard your users',
     description:
-      "Invite up to 100 users to install the iVALT mobile app. They register face and fingerprint biometrics directly in the app — no enterprise PKI required.",
+      'Invite up to 100 users to install the iVALT mobile app. They register face and fingerprint biometrics directly in the app — no enterprise PKI required.',
   },
   {
     icon: ScanFace,
-    step: "03",
-    title: "Verify identities on demand",
+    step: '03',
+    title: 'Verify identities on demand',
     description:
       "Trigger verification with the IDCONNECTION code and the user's mobile number. They approve via push notification in seconds. You receive the result via API.",
-    cta: { label: "Try it now", href: "/ondemand-id" },
+    cta: { label: 'Try it now', href: '/ondemand-id' },
   },
-]
+];
 
 export function HowItWorks() {
   return (
@@ -95,5 +95,5 @@ export function HowItWorks() {
         </ol>
       </div>
     </section>
-  )
+  );
 }

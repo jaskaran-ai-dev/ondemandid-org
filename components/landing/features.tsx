@@ -5,47 +5,47 @@ import {
   Plug,
   ScrollText,
   Smartphone,
-} from "lucide-react"
-import { Reveal } from "@/components/reveal"
+} from 'lucide-react';
+import { Reveal } from '@/components/reveal';
 
 const FEATURES = [
   {
     icon: Fingerprint,
-    title: "Biometric security",
+    title: 'Biometric security',
     description:
-      "Face and fingerprint recognition powered by the iVALT mobile app — no shared secrets, no passwords to leak.",
+      'Face and fingerprint recognition powered by the iVALT mobile app — no shared secrets, no passwords to leak.',
   },
   {
     icon: Bell,
-    title: "Instant push verification",
+    title: 'Instant push verification',
     description:
-      "Identity requests are delivered as secure push notifications. Users approve in a single tap.",
+      'Identity requests are delivered as secure push notifications. Users approve in a single tap.',
   },
   {
     icon: KeyRound,
-    title: "Zero-password auth",
+    title: 'Zero-password auth',
     description:
-      "Eliminate phishing, credential stuffing, and password reset overhead from your support backlog.",
+      'Eliminate phishing, credential stuffing, and password reset overhead from your support backlog.',
   },
   {
     icon: Plug,
-    title: "Enterprise API",
+    title: 'Enterprise API',
     description:
-      "Three REST endpoints: signup, verify, and status. Integrate into any workflow in an afternoon.",
+      'Three REST endpoints: signup, verify, and status. Integrate into any workflow in an afternoon.',
   },
   {
     icon: ScrollText,
-    title: "Complete audit trail",
+    title: 'Complete audit trail',
     description:
-      "Every verification logs IP, user agent, timestamps, and the raw iVALT response for compliance.",
+      'Every verification logs IP, user agent, timestamps, and the raw iVALT response for compliance.',
   },
   {
     icon: Smartphone,
-    title: "iOS and Android native",
+    title: 'iOS and Android native',
     description:
-      "Mobile-first by design. Works on every modern device with the iVALT companion app installed.",
+      'Mobile-first by design. Works on every modern device with the iVALT companion app installed.',
   },
-]
+];
 
 export function Features() {
   return (
@@ -93,5 +93,5 @@ export function Features() {
         </div>
       </div>
     </section>
-  )
+  );
 }

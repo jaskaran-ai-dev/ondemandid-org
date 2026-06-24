@@ -1,11 +1,14 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Reveal } from "@/components/reveal"
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Reveal } from '@/components/reveal';
 
 export function CTA() {
   return (
-    <section aria-labelledby="cta-heading" className="bg-primary text-primary-foreground">
+    <section
+      aria-labelledby="cta-heading"
+      className="bg-primary text-primary-foreground"
+    >
       <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-8 px-4 py-16 md:flex-row md:items-center md:justify-between md:px-6 md:py-20">
         <Reveal direction="left" className="max-w-2xl">
           <h2
@@ -47,5 +50,5 @@ export function CTA() {
         </Reveal>
       </div>
     </section>
-  )
+  );
 }

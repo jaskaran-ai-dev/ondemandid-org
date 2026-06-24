@@ -1,23 +1,26 @@
 // Email sending functions with template rendering
 
-import { readFileSync } from "fs"
-import { join } from "path"
-import { sendEmail } from "./transport"
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { sendEmail } from './transport';
 
 interface TemplateVariables {
-  [key: string]: string | number
+  [key: string]: string | number;
 }
 
-function renderTemplate(templatePath: string, variables: TemplateVariables): string {
-  const template = readFileSync(templatePath, "utf-8")
-  let rendered = template
-  
+function renderTemplate(
+  templatePath: string,
+  variables: TemplateVariables
+): string {
+  const template = readFileSync(templatePath, 'utf-8');
+  let rendered = template;
+
   for (const [key, value] of Object.entries(variables)) {
-    const regex = new RegExp(`{{${key}}}`, "g")
-    rendered = rendered.replace(regex, String(value))
+    const regex = new RegExp(`{{${key}}}`, 'g');
+    rendered = rendered.replace(regex, String(value));
   }
-  
-  return rendered
+
+  return rendered;
 }
 
 // Check if email is configured
@@ -31,14 +34,14 @@ function isEmailConfigured(): boolean {
 
 // Admin Signup Notification
 export async function sendAdminSignupNotification(data: {
-  companyName: string
-  contactName: string
-  email: string
-  countryCode: string
-  mobile: string
-  initialUsers: number
-  notes: string
-  customerId: string
+  companyName: string;
+  contactName: string;
+  email: string;
+  countryCode: string;
+  mobile: string;
+  initialUsers: number;
+  notes: string;
+  customerId: string;
 }): Promise<void> {
   // Skip if email not configured
   if (!isEmailConfigured()) {
@@ -63,9 +66,9 @@ export async function sendAdminSignupNotification(data: {
 
 // Customer Confirmation
 export async function sendCustomerConfirmation(data: {
-  email: string
-  companyName: string
-  customerId: string
+  email: string;
+  companyName: string;
+  customerId: string;
 }): Promise<void> {
   // Skip if email not configured
   if (!isEmailConfigured()) {
@@ -78,7 +81,7 @@ export async function sendCustomerConfirmation(data: {
   
   await sendEmail({
     to: data.email,
-    subject: "Registration Received - iVALT OnDemand ID",
+    subject: 'Registration Received - iVALT OnDemand ID',
     html,
     text: `Thank you for registering ${data.companyName} for iVALT OnDemand ID trial access.\n\nReference ID: ${data.customerId}\n\nAn iVALT representative will provision your IDCONNECTION code within one business day.`,
   }).catch((error) => {
@@ -88,12 +91,12 @@ export async function sendCustomerConfirmation(data: {
 
 // Admin Verification Alert
 export async function sendAdminVerificationAlert(data: {
-  idConnection: string
-  countryCode: string
-  mobile: string
-  status: string
-  ivaltStatusCode: number
-  requestId: string
+  idConnection: string;
+  countryCode: string;
+  mobile: string;
+  status: string;
+  ivaltStatusCode: number;
+  requestId: string;
 }): Promise<void> {
   // Skip if email not configured
   if (!isEmailConfigured()) {

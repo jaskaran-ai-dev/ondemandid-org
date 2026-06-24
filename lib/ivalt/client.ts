@@ -18,7 +18,7 @@ if (!IVALT_API_KEY) {
 
 async function ivaltRequest<T>(
   endpoint: string,
-  body?: Record<string, unknown>,
+  body?: Record<string, unknown>
 ): Promise<T> {
   const url = `${IVALT_API_BASE_URL}${endpoint}`;
 
@@ -32,7 +32,7 @@ async function ivaltRequest<T>(
   }
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
       "Content-Type": "application/json",
       "X-API-Key": `${IVALT_API_KEY}`,
@@ -94,7 +94,7 @@ export async function triggerAuthRequest(params: {
   countryCode: string;
   mobile: string;
 }): Promise<IvaltAuthRequestResponse> {
-  return ivaltRequest<IvaltAuthRequestResponse>("/biometric-auth-request", {
+  return ivaltRequest<IvaltAuthRequestResponse>('/biometric-auth-request', {
     id_connection: params.idConnection,
     mobile: `${params.countryCode}${params.mobile}`,
   });

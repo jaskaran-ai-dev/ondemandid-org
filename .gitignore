@@ -10,6 +10,11 @@ __v0_jsx-dev-runtime.ts
 .env*.local
 .env
 
+# Package manager lockfiles (only bun.lock allowed)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
 # Dependencies
 node_modules/
 .pnpm-store/
@@ -39,3 +44,8 @@ coverage/
 .vercel/
 *.tsbuildinfo
 local.db
+
+# CodeDB snapshot
+codedb.snapshot
+
+.poolside/

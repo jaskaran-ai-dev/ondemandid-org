@@ -1,14 +1,15 @@
-import type { Metadata } from "next"
-import { VerificationClient } from "@/components/verification/verification-client"
+import type { Metadata } from 'next';
+import { VerificationClient } from '@/components/verification/verification-client';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://ondemandid.ivalt.com"
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://ondemandid.ivalt.com';
 
 export const metadata: Metadata = {
-  title: "Verify identity with iVALT",
+  title: 'Verify identity with iVALT',
   description:
     "Trigger biometric identity verification via the iVALT mobile app. Enter your IDCONNECTION code and the user's mobile number to send a secure push notification.",
   openGraph: {
-    title: "OnDemand ID — Verify identity with iVALT",
+    title: 'OnDemand ID — Verify identity with iVALT',
     description:
       "Trigger biometric identity verification via the iVALT mobile app. Enter your IDCONNECTION code and the user's mobile number.",
     url: `${baseUrl}/ondemand-id`,
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-}
+};
 
 export default function OnDemandIdPage() {
   return (
@@ -43,5 +44,5 @@ export default function OnDemandIdPage() {
         <VerificationClient />
       </div>
     </div>
-  )
+  );
 }

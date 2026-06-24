@@ -1,9 +1,9 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface InputProps extends React.ComponentProps<'input'> {
-  leftIcon?: React.ReactNode
+  leftIcon?: React.ReactNode;
 }
 
 function Input({ className, type, leftIcon, ...props }: InputProps) {
@@ -22,12 +22,12 @@ function Input({ className, type, leftIcon, ...props }: InputProps) {
           'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
           'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
           leftIcon && 'pl-10',
-          className,
+          className
         )}
         {...props}
       />
     </div>
-  )
+  );
 }
 
-export { Input }
+export { Input };

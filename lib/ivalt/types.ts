@@ -1,9 +1,9 @@
 // iVALT API response types
 
 export interface IvaltAuthRequestResponse {
-  status: "initiated" | "pending"
-  requestId: string
-  message?: string
+  status: 'initiated' | 'pending';
+  requestId: string;
+  message?: string;
 }
 
 // New response format from iVALT API
@@ -43,12 +43,12 @@ export interface IvaltAuthResultResponse {
 }
 
 export interface IvaltGeoFenceResponse {
-  status: "authenticated" | "failed"
-  statusCode: number
+  status: 'authenticated' | 'failed';
+  statusCode: number;
   location?: {
-    latitude: number
-    longitude: number
-    accuracy: number
-  }
-  timestamp?: string
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+  };
+  timestamp?: string;
 }

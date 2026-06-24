@@ -1,0 +1,7 @@
+.next
+node_modules
+*.db
+*.log
+pnpm-lock.yaml
+bun.lock
+codedb.snapshot

@@ -1,16 +1,17 @@
-import type { Metadata } from "next"
-import { SignupClient } from "@/components/signup/signup-client"
+import type { Metadata } from 'next';
+import { SignupClient } from '@/components/signup/signup-client';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://ondemandid.ivalt.com"
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://ondemandid.ivalt.com';
 
 export const metadata: Metadata = {
-  title: "Start your trial",
+  title: 'Start your trial',
   description:
-    "Register your company to receive an iVALT IDCONNECTION code and start verifying user identities with biometric push notifications.",
+    'Register your company to receive an iVALT IDCONNECTION code and start verifying user identities with biometric push notifications.',
   openGraph: {
-    title: "Start your iVALT OnDemand ID trial",
+    title: 'Start your iVALT OnDemand ID trial',
     description:
-      "Register your company to receive an IDCONNECTION code. Provision up to 100 trial users and verify identities with biometric push notifications.",
+      'Register your company to receive an IDCONNECTION code. Provision up to 100 trial users and verify identities with biometric push notifications.',
     url: `${baseUrl}/signup`,
   },
   alternates: {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-}
+};
 
 export default function SignupPage() {
   return (
@@ -43,5 +44,5 @@ export default function SignupPage() {
         <SignupClient />
       </div>
     </div>
-  )
+  );
 }
