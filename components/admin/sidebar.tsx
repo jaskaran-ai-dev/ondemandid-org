@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -10,8 +11,15 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  Menu,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 const navigation = [
   {
@@ -39,6 +47,7 @@ const navigation = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [open, setOpen] = React.useState(false);
 
   const handleLogout = async () => {
     try {
@@ -51,8 +60,8 @@ export function AdminSidebar() {
     }
   };
 
-  return (
-    <aside className="sticky top-0 flex h-screen w-64 flex-col border-r bg-muted/40">
+  const SidebarContent = () => (
+    <>
       {/* Logo / Brand */}
       <div className="flex h-16 items-center gap-2 border-b px-6">
         <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
@@ -81,6 +90,7 @@ export function AdminSidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => setOpen(false)}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
@@ -102,6 +112,7 @@ export function AdminSidebar() {
           <p className="text-xs text-muted-foreground">+91 9530654704</p>
         </div>
         <button
+          type="button"
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
         >
@@ -109,6 +120,43 @@ export function AdminSidebar() {
           Logout
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Menu Button */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex h-16 items-center gap-2 border-b bg-background px-4">
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Menu className="size-5" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-64">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+        <div className="flex items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+            <ShieldCheck className="size-5 text-primary" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold leading-tight">
+              iVALT Admin
+            </span>
+            <span className="text-xs text-muted-foreground leading-tight">
+              OnDemand ID
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex sticky top-0 h-screen w-64 flex-col border-r bg-muted/40">
+        <SidebarContent />
+      </aside>
+    </>
   );
 }
