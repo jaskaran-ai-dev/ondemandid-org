@@ -4,8 +4,6 @@ import { Analytics } from '@vercel/analytics/next';
 import { CustomThemeProvider } from '@/components/theme-provider-custom';
 import { QueryProvider } from '@/components/query-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { SiteHeader } from '@/components/site-header';
-import { SiteFooter } from '@/components/site-footer';
 import './globals.css';
 
 const inter = Inter({
@@ -108,12 +106,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${sourceSerif.variable} bg-background`}
     >
-      <body className="font-sans antialiased min-h-screen flex flex-col bg-background text-foreground">
+      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
         <QueryProvider>
           <CustomThemeProvider defaultTheme="system" storageKey="ivalt-theme">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
+            {children}
             <Toaster richColors position="top-center" />
           </CustomThemeProvider>
         </QueryProvider>
