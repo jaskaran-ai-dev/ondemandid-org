@@ -185,7 +185,7 @@ export function CustomerCreateDialog() {
                 </SelectTrigger>
                 <SelectContent>
                   {COUNTRY_CODES.map(country => (
-                    <SelectItem key={country.code} value={country.code}>
+                    <SelectItem key={`${country.code}-${country.iso}`} value={country.code}>
                       {country.flag} {country.code}
                     </SelectItem>
                   ))}
