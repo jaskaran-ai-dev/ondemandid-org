@@ -190,3 +190,46 @@ export async function updateCustomer(
   if (updated.length === 0) throw new Error('Customer not found');
   return { ok: true };
 }
+
+export async function createCustomer(
+  data: {
+    companyName: string;
+    contactName: string;
+    email: string;
+    countryCode: string;
+    mobile: string;
+    initialUsers: number;
+    notes: string | null;
+  }
+): Promise<{ id: string | number; ok: boolean }> {
+  const isDemo = process.env.DEMO_MODE === 'true';
+
+  if (isDemo) {
+    const id = `cust_${Math.random().toString(36).slice(2, 10)}`;
+    return { id, ok: true };
+  }
+
+  const insertData: Record<string, unknown> = {
+    companyName: data.companyName,
+    contactName: data.contactName,
+    email: data.email,
+    countryCode: data.countryCode,
+    mobile: data.mobile,
+    initialUsers: data.initialUsers,
+    notes: data.notes,
+    status: 'pending',
+  };
+
+  if (process.env.DB_TYPE === 'neon') {
+    insertData.createdAt = new Date();
+  } else {
+    insertData.createdAt = sql`${Math.floor(Date.now() / 1000)}`;
+  }
+
+  const customer = await db
+    .insert(schema.customers)
+    .values(insertData)
+    .returning();
+
+  return { id: customer[0].id, ok: true };
+}

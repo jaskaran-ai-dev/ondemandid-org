@@ -29,3 +29,19 @@ export function useAdminUpdateCustomer() {
     },
   });
 }
+
+export function useAdminCreateCustomer() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...orpc.customers.create.mutationOptions(),
+    onSuccess: () => {
+      toast.success('Customer created successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-customers'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create customer');
+    },
+  });
+}

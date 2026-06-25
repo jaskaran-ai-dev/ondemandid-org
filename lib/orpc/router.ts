@@ -2,7 +2,7 @@ import { ORPCError } from '@orpc/server';
 import { z } from 'zod';
 import { authedProcedure } from './context';
 import { getDashboardStats } from '@/lib/db/queries/stats';
-import { getCustomers, updateCustomer } from '@/lib/db/queries/customers';
+import { getCustomers, updateCustomer, createCustomer } from '@/lib/db/queries/customers';
 import { getRequests } from '@/lib/db/queries/requests';
 
 const customerUpdateSchema = z.object({
@@ -10,6 +10,16 @@ const customerUpdateSchema = z.object({
   status: z.enum(['pending', 'active', 'inactive']).optional(),
   idConnection: z.string().max(50).optional(),
   notes: z.string().max(2000).optional(),
+});
+
+const customerCreateSchema = z.object({
+  companyName: z.string().min(2).max(255),
+  contactName: z.string().min(2).max(255),
+  email: z.string().email().max(320),
+  countryCode: z.string().regex(/^\+\d{1,4}$/),
+  mobile: z.string().regex(/^\d{6,14}$/),
+  initialUsers: z.number().int().min(1).max(100),
+  notes: z.string().max(2000).nullable().optional(),
 });
 
 export const adminStats = authedProcedure.handler(async () => {
@@ -70,6 +80,28 @@ export const adminCustomerUpdate = authedProcedure
     }
   });
 
+export const adminCustomerCreate = authedProcedure
+  .input(customerCreateSchema)
+  .handler(async ({ input }) => {
+    try {
+      const result = await createCustomer({
+        ...input,
+        notes: input.notes ?? null,
+      });
+      return result;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('duplicate')) {
+        throw new ORPCError('CONFLICT', {
+          message: 'A customer with this email already exists',
+        });
+      }
+      console.error('Admin customer create error:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to create customer',
+      });
+    }
+  });
+
 export const adminRequestsList = authedProcedure
   .input(
     z.object({
@@ -99,6 +131,7 @@ export const adminRouter = {
   customers: {
     list: adminCustomersList,
     update: adminCustomerUpdate,
+    create: adminCustomerCreate,
   },
   requests: {
     list: adminRequestsList,
