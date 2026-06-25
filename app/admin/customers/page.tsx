@@ -1,5 +1,6 @@
 import { CustomersTable } from '@/components/admin/customers-table';
 import { CustomerCreateDialog } from '@/components/admin/customer-create-dialog';
+import { CustomerStats } from '@/components/admin/customer-stats';
 
 export default function AdminCustomersPage() {
   return (
@@ -15,6 +16,7 @@ export default function AdminCustomersPage() {
         </div>
         <CustomerCreateDialog />
       </div>
+      <CustomerStats />
       <CustomersTable />
     </div>
   );
