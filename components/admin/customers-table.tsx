@@ -24,6 +24,7 @@ import {
 import { Users, Search, Building2 } from 'lucide-react';
 import { useAdminCustomers } from '@/hooks/use-admin-customers';
 import { CustomerEditDialog } from './customer-edit-dialog';
+import { Pagination } from './pagination';
 
 interface Customer {
   id: string | number;
@@ -60,12 +61,13 @@ function formatDate(ts: number) {
   });
 }
 
-const PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 10;
 
 export function CustomersTable() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
@@ -73,12 +75,13 @@ export function CustomersTable() {
   const { data, isLoading } = useAdminCustomers(
     statusFilter !== 'all' ? statusFilter : undefined,
     search || undefined,
-    page
+    page,
+    pageSize
   );
 
   const customers: Customer[] = useMemo(() => data?.customers ?? [], [data]);
   const total: number = useMemo(() => data?.total ?? 0, [data]);
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
     <>
@@ -201,30 +204,17 @@ export function CustomersTable() {
 
       {/* Pagination */}
       {!isLoading && customers.length > 0 && (
-        <div className="flex items-center justify-between border-t px-4 py-3">
-          <p className="text-sm text-muted-foreground">
-            Showing {(page - 1) * PAGE_SIZE + 1}&ndash;
-            {Math.min(page * PAGE_SIZE, total)} of {total}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage(p => p + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={size => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
       )}
 
       {/* Edit dialog */}

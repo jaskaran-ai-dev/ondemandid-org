@@ -7,10 +7,11 @@ import { toast } from 'sonner';
 export function useAdminCustomers(
   status?: string,
   search?: string,
-  page: number = 1
+  page: number = 1,
+  pageSize?: number
 ) {
   return useQuery(
-    orpc.customers.list.queryOptions({ input: { status, search, page } })
+    orpc.customers.list.queryOptions({ input: { status, search, page, pageSize } })
   );
 }
 

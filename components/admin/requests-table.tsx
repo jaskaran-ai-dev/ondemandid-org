@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
@@ -22,6 +21,7 @@ import {
 } from '@/components/ui/table';
 import { FileText, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useAdminRequests } from '@/hooks/use-admin-requests';
+import { Pagination } from './pagination';
 
 interface VerificationRequest {
   id: string | number;
@@ -71,15 +71,17 @@ function formatDuration(start: number, end: number | null) {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
-const PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 10;
 
 export function AdminRequests() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
   const { data, isLoading } = useAdminRequests(
     statusFilter !== 'all' ? statusFilter : undefined,
-    page
+    page,
+    pageSize
   );
 
   const requests: VerificationRequest[] = useMemo(
@@ -90,7 +92,7 @@ export function AdminRequests() {
     () => (data as { total?: number })?.total ?? 0,
     [data]
   );
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const summary = {
     authenticated: requests.filter(r => r.status === 'authenticated').length,
@@ -237,30 +239,17 @@ export function AdminRequests() {
 
       {/* Pagination */}
       {!isLoading && requests.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {(page - 1) * PAGE_SIZE + 1}&ndash;
-            {Math.min(page * PAGE_SIZE, total)} of {total}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage(p => p + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={size => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
       )}
     </div>
   );
