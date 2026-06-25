@@ -25,6 +25,10 @@ import {
 import { COUNTRY_CODES } from '@/lib/country-codes';
 import { useAdminCreateCustomer } from '@/hooks/use-admin-customers';
 
+const COUNTRY_BY_ISO = Object.fromEntries(
+  COUNTRY_CODES.map(c => [c.iso, c.code])
+);
+
 export function CustomerCreateDialog() {
   const [open, setOpen] = useState(false);
   const createMutation = useAdminCreateCustomer();
@@ -33,7 +37,7 @@ export function CustomerCreateDialog() {
     companyName: '',
     contactName: '',
     email: '',
-    countryCode: '+91',
+    countryCode: 'IN',
     mobile: '',
     initialUsers: '1',
     notes: '',
@@ -89,7 +93,7 @@ export function CustomerCreateDialog() {
         companyName: formData.companyName.trim(),
         contactName: formData.contactName.trim(),
         email: formData.email.trim().toLowerCase(),
-        countryCode: formData.countryCode,
+        countryCode: COUNTRY_BY_ISO[formData.countryCode] || '+91',
         mobile: formData.mobile.trim(),
         initialUsers: parseInt(formData.initialUsers, 10),
         notes: formData.notes.trim() || null,
@@ -101,7 +105,7 @@ export function CustomerCreateDialog() {
             companyName: '',
             contactName: '',
             email: '',
-            countryCode: '+91',
+            countryCode: 'IN',
             mobile: '',
             initialUsers: '1',
             notes: '',
@@ -185,7 +189,7 @@ export function CustomerCreateDialog() {
                 </SelectTrigger>
                 <SelectContent>
                   {COUNTRY_CODES.map(country => (
-                    <SelectItem key={`${country.code}-${country.iso}`} value={country.code}>
+                    <SelectItem key={country.iso} value={country.iso}>
                       {country.flag} {country.code}
                     </SelectItem>
                   ))}
