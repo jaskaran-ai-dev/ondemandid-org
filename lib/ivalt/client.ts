@@ -20,6 +20,12 @@ async function ivaltRequest<T>(
   endpoint: string,
   body?: Record<string, unknown>
 ): Promise<T> {
+  if (!IVALT_API_KEY) {
+    throw new Error(
+      'IVALT_API_KEY is not set. Configure it in .env or enable DEMO_MODE=true.'
+    );
+  }
+
   const url = `${IVALT_API_BASE_URL}${endpoint}`;
 
   // Log request in development mode
@@ -35,7 +41,7 @@ async function ivaltRequest<T>(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': `${IVALT_API_KEY}`,
+      'x-api-key': IVALT_API_KEY,
     },
     body: body ? JSON.stringify(body) : undefined,
   });
