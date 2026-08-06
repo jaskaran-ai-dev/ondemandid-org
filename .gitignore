@@ -10,10 +10,10 @@ __v0_jsx-dev-runtime.ts
 .env*.local
 .env
 
-# Package manager lockfiles (only bun.lock allowed)
-pnpm-lock.yaml
+# Package manager lockfiles (pnpm used; track pnpm-lock.yaml)
 package-lock.json
 yarn.lock
+bun.lock
 
 # Dependencies
 node_modules/
