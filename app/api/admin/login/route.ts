@@ -25,11 +25,11 @@ const loginSchema = z.object({
 declare global {
   // eslint-disable-next-line no-var
   var __adminLoginAttempts:
-    | Map<string, { mobile: string; createdAt: number }>
+    | Map<string, { countryCode: string; mobile: string; createdAt: number }>
     | undefined;
 }
 
-const loginAttempts: Map<string, { mobile: string; createdAt: number }> =
+const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
   globalThis.__adminLoginAttempts ?? new Map();
 if (!globalThis.__adminLoginAttempts) {
   globalThis.__adminLoginAttempts = loginAttempts;
@@ -80,12 +80,15 @@ export async function POST(request: Request) {
 
     const isDemoMode = process.env.DEMO_MODE === 'true';
 
+    // Generate a unique requestId for tracking (same as verify route pattern)
+    const requestId = `admin_login_${Math.random().toString(36).slice(2, 12)}`;
+
     if (isDemoMode) {
       // Simulate iVALT auth request
       await new Promise(r => setTimeout(r, 400));
-      const requestId = `admin_login_${Math.random().toString(36).slice(2, 12)}`;
       loginAttempts.set(requestId, {
-        mobile: `${countryCode}${mobile}`,
+        countryCode,
+        mobile,
         createdAt: Date.now(),
       });
       return NextResponse.json({
@@ -97,15 +100,15 @@ export async function POST(request: Request) {
 
     // Production: trigger real iVALT auth request
     try {
-      const authRequest = await triggerAuthRequest({
+      await triggerAuthRequest({
         idConnection: ADMIN_ID_CONNECTION,
         countryCode,
         mobile,
       });
 
-      const requestId = authRequest.requestId;
       loginAttempts.set(requestId, {
-        mobile: `${countryCode}${mobile}`,
+        countryCode,
+        mobile,
         createdAt: Date.now(),
       });
 
@@ -116,10 +119,11 @@ export async function POST(request: Request) {
       });
     } catch (error) {
       console.error('Admin login iVALT error:', error);
-      return NextResponse.json(
-        { error: 'Failed to send authentication request. Please try again.' },
-        { status: 500 }
-      );
+      const message =
+        error instanceof Error && error.message.includes('IVALT_API_KEY')
+          ? 'iVALT API key is not configured. Set IVALT_API_KEY in .env or enable DEMO_MODE=true.'
+          : 'Failed to send authentication request. Please try again.';
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   } catch (error) {
     console.error('Admin login error:', error);

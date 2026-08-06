@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthResult, mapIvaltStatus } from '@/lib/ivalt';
-import {
-  setSessionCookie,
-  ADMIN_COUNTRY_CODE,
-  ADMIN_MOBILE,
-  ADMIN_ID_CONNECTION,
-} from '@/lib/admin/auth';
+import { setSessionCookie } from '@/lib/admin/auth';
 
 // Demo mode store for admin login resolution
 declare global {
@@ -18,6 +13,17 @@ const resolveAt: Map<string, number> =
 if (!globalThis.__adminLoginResolve) {
   globalThis.__adminLoginResolve = resolveAt;
 }
+
+// Reference the same in-memory store used by the login route
+declare global {
+  // eslint-disable-next-line no-var
+  var __adminLoginAttempts:
+    | Map<string, { countryCode: string; mobile: string; createdAt: number }>
+    | undefined;
+}
+
+const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
+  globalThis.__adminLoginAttempts ?? new Map();
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -56,14 +62,35 @@ export async function GET(request: Request) {
     return response;
   }
 
-  // Production: poll iVALT API
+  // Production: poll iVALT API using stored mobile number
+  const attempt = loginAttempts.get(requestId);
+  if (!attempt) {
+    return NextResponse.json(
+      { error: 'Invalid or expired login session' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const authResult = await getAuthResult(requestId);
-    const { status, ivaltStatusCode } = mapIvaltStatus(authResult.statusCode);
+    const authResult = await getAuthResult({
+      countryCode: attempt.countryCode,
+      mobile: attempt.mobile,
+    });
+
+    // Parse iVALT response - handle both new and old response formats
+    let statusCode: number;
+    if (authResult.data) {
+      // New format: { data: { status: true, ... }, error: null }
+      statusCode = authResult.data.status === true ? 200 : 422;
+    } else {
+      // Old format: { statusCode: 200, ... }
+      statusCode = authResult.statusCode ?? 422;
+    }
+
+    const { status, ivaltStatusCode } = mapIvaltStatus(statusCode);
 
     if (status === 'authenticated') {
-      // Verify the mobile matches admin before creating session
-      // (The requestId was created with admin credentials, so this is safe)
+      loginAttempts.delete(requestId);
       const response = NextResponse.json({
         status: 'authenticated',
         ivaltStatusCode,
@@ -79,7 +106,8 @@ export async function GET(request: Request) {
       });
     }
 
-    // failed or not_found
+    // failed or not_found - clean up
+    loginAttempts.delete(requestId);
     return NextResponse.json({
       status,
       ivaltStatusCode,
