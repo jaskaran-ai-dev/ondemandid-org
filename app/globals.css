@@ -218,6 +218,23 @@
   }
 }
 
+@keyframes anim-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5.5rem);
+  }
+}
+
 @layer utilities {
   /* Entrance animations — applied immediately on mount, no JS needed.
      Uses opacity + transform only to stay on the compositor thread. */
@@ -237,6 +254,9 @@
   .anim-shimmer {
     background-size: 200% 100%;
     animation: anim-shimmer 2.4s linear infinite;
+  }
+  .anim-scan {
+    animation: anim-scan 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   /* Stagger helpers — apply on a parent or sibling row. */
@@ -292,7 +312,8 @@
   .anim-fade-in,
   .anim-scale-in,
   .anim-blob,
-  .anim-shimmer {
+  .anim-shimmer,
+  .anim-scan {
     animation: none !important;
   }
   .reveal {
