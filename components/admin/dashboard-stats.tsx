@@ -1,15 +1,20 @@
 'use client';
 
+import Link from 'next/link';
+
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
+  CardFooter,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminStats } from '@/hooks/use-admin-stats';
+import { cn } from '@/lib/utils';
 import {
   Users,
   UserCheck,
@@ -18,6 +23,7 @@ import {
   XCircle,
   Clock,
   TrendingUp,
+  ArrowRight,
 } from 'lucide-react';
 
 function StatCard({
@@ -35,16 +41,19 @@ function StatCard({
 }) {
   return (
     <Card>
-      <CardContent className="flex items-center justify-between">
+      <CardContent className="flex items-center justify-between p-4">
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight">{value}</p>
+          <p className="text-2xl font-bold tracking-tight">{value}</p>
           <p className="text-xs text-muted-foreground">{description}</p>
         </div>
         <div
-          className={`flex size-12 items-center justify-center rounded-xl ${accent || 'bg-primary/10'}`}
+          className={cn(
+            'flex size-10 shrink-0 items-center justify-center rounded-lg',
+            accent || 'bg-primary/10'
+          )}
         >
-          <Icon className="size-6 text-primary" />
+          <Icon className="size-5 text-primary" />
         </div>
       </CardContent>
     </Card>
@@ -80,8 +89,70 @@ export function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Spinner className="size-8" />
+      <div className="space-y-8">
+        <div>
+          <h1 className="font-serif text-2xl font-semibold tracking-tight">
+            Dashboard Overview
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Monitor customers and verification activity at a glance.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                  <Skeleton className="size-10 rounded-lg" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-8 w-12" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="size-10 rounded-lg" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardHeader className="space-y-2">
+            <Skeleton className="h-5 w-56" />
+            <Skeleton className="h-4 w-72" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between rounded-lg border px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-9 rounded-md" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -123,7 +194,7 @@ export function AdminDashboard() {
           value={data.activeCustomers}
           icon={UserCheck}
           description={`${data.pendingCustomers} pending provisioning`}
-          accent="bg-primary/10"
+          accent="bg-green-500/10"
         />
         <StatCard
           title="Total Requests"
@@ -137,44 +208,32 @@ export function AdminDashboard() {
           value={`${successRate}%`}
           icon={TrendingUp}
           description={`${data.authenticatedRequests} authenticated`}
-          accent="bg-primary/10"
+          accent="bg-green-500/10"
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <CheckCircle2 className="size-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{data.authenticatedRequests}</p>
-              <p className="text-xs text-muted-foreground">Authenticated</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10">
-              <XCircle className="size-5 text-destructive" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{data.failedRequests}</p>
-              <p className="text-xs text-muted-foreground">Failed</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-              <Clock className="size-5 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{data.pendingRequests}</p>
-              <p className="text-xs text-muted-foreground">Pending</p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Authenticated"
+          value={data.authenticatedRequests}
+          icon={CheckCircle2}
+          description="Successful verifications"
+          accent="bg-green-500/10"
+        />
+        <StatCard
+          title="Failed"
+          value={data.failedRequests}
+          icon={XCircle}
+          description="Failed verifications"
+          accent="bg-red-500/10"
+        />
+        <StatCard
+          title="Pending"
+          value={data.pendingRequests}
+          icon={Clock}
+          description="Waiting for response"
+          accent="bg-yellow-500/10"
+        />
       </div>
 
       <Card>
@@ -215,6 +274,16 @@ export function AdminDashboard() {
             </div>
           )}
         </CardContent>
+        {data.recentRequests.length > 0 && (
+          <CardFooter>
+            <Button asChild variant="ghost" size="sm" className="ml-auto">
+              <Link href="/admin/requests">
+                View all requests
+                <ArrowRight />
+              </Link>
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

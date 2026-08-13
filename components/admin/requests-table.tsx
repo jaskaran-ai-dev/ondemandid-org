@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -115,35 +115,56 @@ export function AdminRequests() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <CheckCircle2 className="size-5 text-primary" />
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                Authenticated
+              </p>
+              <p className="text-2xl font-bold tracking-tight">
+                {summary.authenticated}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Successful verifications
+              </p>
             </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.authenticated}</p>
-              <p className="text-xs text-muted-foreground">Authenticated</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-destructive/10">
-              <XCircle className="size-5 text-destructive" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.failed}</p>
-              <p className="text-xs text-muted-foreground">Failed</p>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
+              <CheckCircle2 className="size-5 text-green-500" />
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center gap-4">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-              <Clock className="size-5 text-muted-foreground" />
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                Failed
+              </p>
+              <p className="text-2xl font-bold tracking-tight">
+                {summary.failed}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Failed verifications
+              </p>
             </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.pending}</p>
-              <p className="text-xs text-muted-foreground">Pending</p>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
+              <XCircle className="size-5 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                Pending
+              </p>
+              <p className="text-2xl font-bold tracking-tight">
+                {summary.pending}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Waiting for response
+              </p>
+            </div>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-yellow-500/10">
+              <Clock className="size-5 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
@@ -173,8 +194,28 @@ export function AdminRequests() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <Spinner className="size-6" />
+            <div className="p-0">
+              <div className="border-b px-4 py-3">
+                <div className="grid grid-cols-8 gap-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Skeleton key={i} className="h-4" />
+                  ))}
+                </div>
+              </div>
+              <div className="divide-y">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="grid grid-cols-8 gap-4 px-4 py-3">
+                    <Skeleton className="h-5 w-24 rounded" />
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                    <Skeleton className="h-4 w-10" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : requests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
