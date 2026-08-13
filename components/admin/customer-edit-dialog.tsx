@@ -43,6 +43,16 @@ function formatDate(ts: number) {
   });
 }
 
+function generateIdConnection(companyName: string) {
+  const base =
+    companyName
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .slice(0, 4) || 'IVT';
+  const num = Math.floor(10 + Math.random() * 90);
+  return `${base}${num}`;
+}
+
 export function CustomerEditDialog({
   customer,
   onClose,
@@ -55,6 +65,13 @@ export function CustomerEditDialog({
   const [editIdConnection, setEditIdConnection] = useState(
     customer.idConnection || ''
   );
+
+  const handleStatusChange = (status: string) => {
+    setEditStatus(status);
+    if (status === 'active' && !editIdConnection.trim()) {
+      setEditIdConnection(generateIdConnection(customer.companyName));
+    }
+  };
 
   const handleSave = () => {
     updateMutation.mutate(
@@ -110,7 +127,7 @@ export function CustomerEditDialog({
           <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
-              <Select value={editStatus} onValueChange={setEditStatus}>
+              <Select value={editStatus} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
