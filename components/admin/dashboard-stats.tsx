@@ -8,7 +8,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
+  CardAction,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,27 @@ function formatTime(ts: number) {
   if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
   return `${Math.floor(diff / 86400000)}d ago`;
+}
+
+function RequestStatusIcon({ status }: { status: string }) {
+  const map: Record<string, { icon: React.ComponentType<{ className?: string }>; cls: string }> = {
+    authenticated: { icon: CheckCircle2, cls: 'bg-green-500/10 text-green-500' },
+    failed: { icon: XCircle, cls: 'bg-red-500/10 text-red-500' },
+    pending: { icon: Clock, cls: 'bg-yellow-500/10 text-yellow-500' },
+    initiated: { icon: Clock, cls: 'bg-yellow-500/10 text-yellow-500' },
+    not_found: { icon: FileText, cls: 'bg-muted text-muted-foreground' },
+  };
+  const entry = map[status] ?? map.not_found;
+  return (
+    <div
+      className={cn(
+        'flex size-9 shrink-0 items-center justify-center rounded-lg',
+        entry.cls
+      )}
+    >
+      <entry.icon className="size-4" />
+    </div>
+  );
 }
 
 export function AdminDashboard() {
@@ -236,35 +257,43 @@ export function AdminDashboard() {
         />
       </div>
 
-      <Card>
+      <Card className="overflow-hidden pt-4">
         <CardHeader>
           <CardTitle>Recent Verification Requests</CardTitle>
           <CardDescription>
             Latest activity across all customer connections
           </CardDescription>
+          <CardAction>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/requests">
+                View all
+                <ArrowRight />
+              </Link>
+            </Button>
+          </CardAction>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0 pb-0">
           {data.recentRequests.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">
               No verification requests yet.
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="divide-y">
               {data.recentRequests.map(req => (
                 <div
                   key={req.id}
-                  className="flex items-center justify-between rounded-lg border px-4 py-3"
+                  className="flex items-center gap-3 px-6 py-3 transition-colors hover:bg-muted/50"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-9 items-center justify-center rounded-md bg-muted">
-                      <FileText className="size-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{req.idConnection}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {req.mobile} - {formatTime(req.createdAt)}
-                      </p>
-                    </div>
+                  <RequestStatusIcon status={req.status} />
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 text-sm font-medium">
+                      <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono normal-case">
+                        {req.idConnection}
+                      </code>
+                    </p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {req.mobile} · {formatTime(req.createdAt)}
+                    </p>
                   </div>
                   <Badge variant={statusBadgeVariant(req.status)}>
                     {req.status}
@@ -274,16 +303,6 @@ export function AdminDashboard() {
             </div>
           )}
         </CardContent>
-        {data.recentRequests.length > 0 && (
-          <CardFooter>
-            <Button asChild variant="ghost" size="sm" className="ml-auto">
-              <Link href="/admin/requests">
-                View all requests
-                <ArrowRight />
-              </Link>
-            </Button>
-          </CardFooter>
-        )}
       </Card>
     </div>
   );
