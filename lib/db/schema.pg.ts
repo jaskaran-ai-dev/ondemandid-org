@@ -16,6 +16,7 @@ export const customers = pgTable('customers', {
   notes: text('notes'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 });
 
 export const ondemandRequests = pgTable('ondemand_requests', {
@@ -33,4 +34,5 @@ export const ondemandRequests = pgTable('ondemand_requests', {
   userAgent: text('user_agent'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   completedAt: timestamp('completed_at'),
+  deletedAt: timestamp('deleted_at'),
 });

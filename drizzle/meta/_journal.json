@@ -8,6 +8,13 @@
       "when": 1779185307169,
       "tag": "0000_flawless_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786617786676,
+      "tag": "0001_cute_slyde",
+      "breakpoints": true
     }
   ]
 }

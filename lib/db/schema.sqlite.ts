@@ -20,6 +20,7 @@ export const customers = sqliteTable('customers', {
   updatedAt: text('updated_at')
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
+  deletedAt: text('deleted_at'),
 });
 
 export const ondemandRequests = sqliteTable('ondemand_requests', {
@@ -39,4 +40,5 @@ export const ondemandRequests = sqliteTable('ondemand_requests', {
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
   completedAt: text('completed_at'),
+  deletedAt: text('deleted_at'),
 });
