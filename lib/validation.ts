@@ -32,10 +32,9 @@ export const signupSchema = z.object({
     .min(1, 'Must onboard at least 1 user')
     .max(100, 'Maximum 100 users for the trial'),
   notes: z.string().max(2000).optional().or(z.literal('')),
-  captchaToken: z
-    .string()
-    .min(1, 'Please complete the security verification')
-    .optional(),
+  // Empty string is the form default when no widget is shown. Server
+  // enforces a token when TURNSTILE_SECRET_KEY / RECAPTCHA_SECRET_KEY is set.
+  captchaToken: z.string().optional().or(z.literal('')),
 });
 
 export type SignupValues = z.infer<typeof signupSchema>;

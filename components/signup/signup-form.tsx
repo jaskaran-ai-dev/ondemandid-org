@@ -196,16 +196,20 @@ export function SignupForm({ onSubmit, submitting }: Props) {
           <CaptchaWidget
             onVerify={token => {
               setCaptchaToken(token);
+              setValue('captchaToken', token, { shouldValidate: true });
               setCaptchaError('');
             }}
             onError={() =>
               setCaptchaError('Security verification failed. Please try again.')
             }
-            onExpire={() => setCaptchaToken('')}
+            onExpire={() => {
+              setCaptchaToken('');
+              setValue('captchaToken', '', { shouldValidate: true });
+            }}
           />
-          {captchaError && (
+          {(captchaError || errors.captchaToken) && (
             <p className="text-xs text-destructive" role="alert">
-              {captchaError}
+              {captchaError || errors.captchaToken?.message}
             </p>
           )}
         </div>
@@ -218,7 +222,7 @@ export function SignupForm({ onSubmit, submitting }: Props) {
         </p>
         <Button
           type="submit"
-          disabled={submitting || (captchaConfigured && !captchaToken)}
+          disabled={submitting}
           className="w-full sm:w-auto"
         >
           {submitting ? (
