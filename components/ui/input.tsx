@@ -4,13 +4,20 @@ import { cn } from '@/lib/utils';
 
 interface InputProps extends React.ComponentProps<'input'> {
   leftIcon?: React.ReactNode;
+  containerClassName?: string;
 }
 
-function Input({ className, type, leftIcon, ...props }: InputProps) {
+function Input({
+  className,
+  type,
+  leftIcon,
+  containerClassName,
+  ...props
+}: InputProps) {
   return (
-    <div className="relative">
+    <div className={cn('relative min-w-0 w-full', containerClassName)}>
       {leftIcon && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
           {leftIcon}
         </div>
       )}

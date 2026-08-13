@@ -12,27 +12,33 @@ export default function Loading() {
       </div>
 
       {/* Content skeleton */}
-      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-12">
+      <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch lg:gap-10">
         {/* Form / main panel skeleton */}
-        <div className="rounded-xl border border-border bg-card p-6 md:p-8 space-y-6">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-36" />
+        <div className="overflow-hidden rounded-xl border border-border bg-card lg:row-start-1">
+          <div className="space-y-2 border-b border-border/70 px-6 pb-4 pt-6 md:px-8">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-6 w-56" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+          <div className="flex flex-col gap-6 px-6 py-6 md:px-8">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-9 w-full rounded-md" />
+              <Skeleton className="h-3 w-64" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-9 w-full rounded-md" />
+              <Skeleton className="h-3 w-56" />
+            </div>
+          </div>
+          <div className="border-t border-border/70 px-6 py-3.5 md:px-8">
             <Skeleton className="h-10 w-full rounded-md" />
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="h-10 w-full rounded-md" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-36" />
-            <Skeleton className="h-10 w-full rounded-md" />
-          </div>
-          <Skeleton className="h-11 w-full rounded-md" />
         </div>
 
         {/* Sidebar skeleton */}
-        <aside className="flex flex-col gap-4">
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="overflow-hidden rounded-xl border border-border bg-card lg:row-start-1">
             <div className="space-y-2 border-b border-border/70 px-6 pb-4 pt-6">
               <Skeleton className="h-3 w-24" />
               <Skeleton className="h-6 w-48" />
@@ -73,18 +79,6 @@ export default function Loading() {
               <Skeleton className="h-3 w-20" />
             </div>
           </div>
-
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <Skeleton className="h-5 w-48" />
-            <Skeleton className="h-4 w-full" />
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-10 w-full rounded-md" />
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );

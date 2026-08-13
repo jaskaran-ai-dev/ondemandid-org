@@ -1,4 +1,5 @@
 import { Check, ScanFace, Smartphone } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { VerificationState } from '@/components/verification/verification-status';
 
 type Phase = 'idle' | 'send' | 'wait' | 'result';
@@ -32,8 +33,10 @@ const STEPS = [
 
 export function HowVerificationWorks({
   stateKind,
+  className,
 }: {
   stateKind: VerificationState['kind'];
+  className?: string;
 }) {
   const phase = phaseFromState(stateKind);
 
@@ -41,7 +44,10 @@ export function HowVerificationWorks({
     <section
       aria-labelledby="how-verify-heading"
       data-phase={phase}
-      className="how-verify relative overflow-hidden rounded-xl border border-border bg-card"
+      className={cn(
+        'how-verify relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card',
+        className
+      )}
     >
       <div
         aria-hidden
@@ -63,7 +69,7 @@ export function HowVerificationWorks({
         </p>
       </header>
 
-      <div className="relative px-6 py-5">
+      <div className="relative flex-1 px-6 py-5">
         <div
           aria-hidden
           className="absolute bottom-8 left-[2.625rem] top-8 w-px bg-border"

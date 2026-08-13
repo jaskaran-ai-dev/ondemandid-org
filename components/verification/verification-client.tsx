@@ -136,47 +136,50 @@ export function VerificationClient({
   const showForm = state.kind === 'idle' || state.kind === 'submitting';
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-12">
-      <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-stretch lg:gap-10">
+      <div className="overflow-hidden rounded-xl border border-border bg-card lg:row-start-1">
         {showForm ? (
           <VerificationForm
             onSubmit={startVerification}
             submitting={verifyMutation.isPending}
           />
         ) : (
-          <VerificationStatus
-            state={state}
-            onReset={handleReset}
-            onRetry={handleRetry}
-          />
+          <div className="p-6 md:p-8">
+            <VerificationStatus
+              state={state}
+              onReset={handleReset}
+              onRetry={handleRetry}
+            />
+          </div>
         )}
       </div>
 
-      <aside className="flex flex-col gap-4">
-        <HowVerificationWorks stateKind={state.kind} />
+      <HowVerificationWorks
+        stateKind={state.kind}
+        className="lg:row-start-1"
+      />
 
-        {demoMode && (
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h2 className="text-sm font-semibold">Demo IDCONNECTION codes</h2>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              Try these codes to see different states. Any 4–12 alphanumeric
-              code is accepted in the demo.
-            </p>
-            <ul className="mt-4 flex flex-col gap-2 text-xs">
-              <DemoCode code="ACME7421" hint="Approved by user" />
-              <DemoCode code="DEMO1234" hint="Approved by user" />
-              <DemoCode
-                code="MISSING01"
-                hint="Returns not_found (user not registered)"
-              />
-              <DemoCode
-                code="ACME7421"
-                hint="With mobile ending 0000 → user denies"
-              />
-            </ul>
-          </div>
-        )}
-      </aside>
+      {demoMode ? (
+        <div className="rounded-xl border border-border bg-card p-6 lg:col-start-2">
+          <h2 className="text-sm font-semibold">Demo IDCONNECTION codes</h2>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            Try these codes to see different states. Any 4–12 alphanumeric
+            code is accepted in the demo.
+          </p>
+          <ul className="mt-4 flex flex-col gap-2 text-xs">
+            <DemoCode code="ACME7421" hint="Approved by user" />
+            <DemoCode code="DEMO1234" hint="Approved by user" />
+            <DemoCode
+              code="MISSING01"
+              hint="Returns not_found (user not registered)"
+            />
+            <DemoCode
+              code="ACME7421"
+              hint="With mobile ending 0000 → user denies"
+            />
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

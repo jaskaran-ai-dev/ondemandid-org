@@ -51,25 +51,35 @@ export function PhoneInput({
   );
 
   return (
-    <div className="flex w-full items-stretch gap-2">
+    <div
+      className={cn(
+        'flex h-9 w-full min-w-0 items-stretch overflow-hidden rounded-md border border-input bg-transparent shadow-xs transition-[color,box-shadow]',
+        'focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50',
+        'dark:bg-input/30',
+        ariaInvalid &&
+          'border-destructive ring-destructive/20 dark:ring-destructive/40'
+      )}
+    >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             role="combobox"
             aria-expanded={open}
             aria-label="Select country dialing code"
             disabled={disabled}
-            className="w-[120px] justify-between font-normal"
+            className="h-auto w-[7.25rem] shrink-0 justify-between rounded-none border-0 border-r border-input px-2.5 font-normal shadow-none hover:bg-secondary/60 dark:hover:bg-input/50"
           >
-            <span className="flex items-center gap-2 truncate">
+            <span className="flex min-w-0 items-center gap-1.5">
               <span aria-hidden className="text-base leading-none">
                 {selected?.flag}
               </span>
-              <span className="font-mono text-sm">{selected?.code}</span>
+              <span className="font-mono text-sm tabular-nums">
+                {selected?.code}
+              </span>
             </span>
-            <ChevronsUpDown className="size-4 opacity-50" />
+            <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[280px] p-0" align="start">
@@ -128,7 +138,8 @@ export function PhoneInput({
           const digits = e.target.value.replace(/\D/g, '').slice(0, 14);
           onMobileChange(digits);
         }}
-        className="flex-1"
+        containerClassName="flex-1"
+        className="h-full rounded-none border-0 bg-transparent shadow-none focus-visible:border-transparent focus-visible:ring-0 dark:bg-transparent"
       />
     </div>
   );

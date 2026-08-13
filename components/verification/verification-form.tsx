@@ -41,97 +41,113 @@ export function VerificationForm({ onSubmit, submitting }: Props) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-5"
+      className="flex h-full min-h-0 flex-col"
       noValidate
     >
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="idConnection" className="text-sm font-medium">
-          IDCONNECTION code
-        </Label>
-        <Input
-          id="idConnection"
-          placeholder="ACME7421"
-          autoComplete="off"
-          autoCapitalize="characters"
-          spellCheck={false}
-          aria-invalid={!!errors.idConnection}
-          disabled={submitting}
-          className="font-mono uppercase tracking-wider"
-          leftIcon={<HugeiconsIcon icon={CodeIcon} size={18} />}
-          {...register('idConnection', {
-            onChange: e => {
-              e.target.value = e.target.value.toUpperCase();
-            },
-          })}
-        />
-        {errors.idConnection ? (
-          <p role="alert" className="text-xs text-destructive">
-            {errors.idConnection.message}
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            4–12 characters, provided by your iVALT administrator.
-          </p>
-        )}
+      <header className="border-b border-border/70 px-6 pb-4 pt-6 md:px-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+          Send request
+        </p>
+        <h2 className="mt-1.5 font-serif text-lg font-semibold tracking-tight">
+          Trigger a biometric check
+        </h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          A secure push is sent to the iVALT app on this number.
+        </p>
+      </header>
+
+      <div className="flex flex-1 flex-col justify-center gap-6 px-6 py-6 md:px-8">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="idConnection" className="text-sm font-medium">
+            IDCONNECTION code
+          </Label>
+          <Input
+            id="idConnection"
+            placeholder="ACME7421"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            aria-invalid={!!errors.idConnection}
+            disabled={submitting}
+            className="font-mono uppercase tracking-wider"
+            leftIcon={<HugeiconsIcon icon={CodeIcon} size={18} />}
+            {...register('idConnection', {
+              onChange: e => {
+                e.target.value = e.target.value.toUpperCase();
+              },
+            })}
+          />
+          {errors.idConnection ? (
+            <p role="alert" className="text-xs text-destructive">
+              {errors.idConnection.message}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              4–12 characters, provided by your iVALT administrator.
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="mobile" className="text-sm font-medium">
+            User mobile number
+          </Label>
+          <PhoneInput
+            id="mobile"
+            countryCode={countryCode}
+            mobile={mobile}
+            onCountryCodeChange={code =>
+              setValue('countryCode', code, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
+            }
+            onMobileChange={m =>
+              setValue('mobile', m, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
+            }
+            disabled={submitting}
+            ariaInvalid={!!errors.mobile}
+            leftIcon={<HugeiconsIcon icon={PhoneCall} size={18} />}
+          />
+          {errors.mobile ? (
+            <p role="alert" className="text-xs text-destructive">
+              {errors.mobile.message}
+            </p>
+          ) : errors.countryCode ? (
+            <p role="alert" className="text-xs text-destructive">
+              {errors.countryCode.message}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              The mobile number registered with iVALT for this user.
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="mobile" className="text-sm font-medium">
-          User mobile number
-        </Label>
-        <PhoneInput
-          id="mobile"
-          countryCode={countryCode}
-          mobile={mobile}
-          onCountryCodeChange={code =>
-            setValue('countryCode', code, {
-              shouldValidate: true,
-              shouldDirty: true,
-            })
-          }
-          onMobileChange={m =>
-            setValue('mobile', m, {
-              shouldValidate: true,
-              shouldDirty: true,
-            })
-          }
+      <footer className="border-t border-border/70 px-6 py-3.5 md:px-8">
+        <Button
+          type="submit"
+          size="lg"
           disabled={submitting}
-          ariaInvalid={!!errors.mobile}
-          leftIcon={<HugeiconsIcon icon={PhoneCall} size={18} />}
-        />
-        {errors.mobile ? (
-          <p role="alert" className="text-xs text-destructive">
-            {errors.mobile.message}
-          </p>
-        ) : errors.countryCode ? (
-          <p role="alert" className="text-xs text-destructive">
-            {errors.countryCode.message}
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            The mobile number registered with iVALT for this user.
-          </p>
-        )}
-      </div>
-
-      <Button
-        type="submit"
-        size="lg"
-        disabled={submitting}
-        className="mt-2 w-full"
-      >
-        {submitting ? (
-          <>
-            <Loader2 className="mr-1 size-4 animate-spin" aria-hidden />
-            Sending request…
-          </>
-        ) : (
-          <>
-            <ScanFace className="mr-1 size-4" aria-hidden />
-            Send verification request
-          </>
-        )}
-      </Button>
+          className="w-full"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="mr-1 size-4 animate-spin" aria-hidden />
+              Sending request…
+            </>
+          ) : (
+            <>
+              <ScanFace className="mr-1 size-4" aria-hidden />
+              Send verification request
+            </>
+          )}
+        </Button>
+      </footer>
     </form>
   );
 }
