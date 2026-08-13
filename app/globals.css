@@ -235,6 +235,82 @@
   }
 }
 
+@keyframes anim-verify-signal {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 2.5rem);
+    opacity: 0;
+  }
+}
+
+@keyframes anim-verify-node {
+  0%,
+  18% {
+    border-color: var(--primary);
+    background-color: color-mix(in oklch, var(--primary) 12%, var(--background));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 16%, transparent);
+  }
+  28%,
+  100% {
+    border-color: var(--border);
+    background-color: var(--background);
+    box-shadow: none;
+  }
+}
+
+@keyframes anim-verify-caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes anim-verify-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  14% {
+    opacity: 1;
+  }
+  86% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(1.6rem);
+  }
+}
+
+@keyframes anim-verify-check {
+  0%,
+  72% {
+    transform: scale(0.82);
+    opacity: 0.45;
+  }
+  82% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @layer utilities {
   /* Entrance animations — applied immediately on mount, no JS needed.
      Uses opacity + transform only to stay on the compositor thread. */
@@ -257,6 +333,49 @@
   }
   .anim-scan {
     animation: anim-scan 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .anim-verify-signal {
+    animation: anim-verify-signal 8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  .anim-verify-node {
+    animation: anim-verify-node 8s ease-in-out infinite;
+  }
+  .anim-verify-caret {
+    animation: anim-verify-caret 1s steps(1, end) infinite;
+  }
+  .anim-verify-scan {
+    animation: anim-verify-scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .anim-verify-check {
+    animation: anim-verify-check 8s ease-in-out infinite;
+  }
+
+  /* Live request path: lock the cycle to the current verification phase. */
+  .how-verify[data-phase='send'] .anim-verify-signal,
+  .how-verify[data-phase='wait'] .anim-verify-signal,
+  .how-verify[data-phase='result'] .anim-verify-signal {
+    animation: none;
+    opacity: 0;
+  }
+  .how-verify[data-phase='send'] .anim-verify-node,
+  .how-verify[data-phase='wait'] .anim-verify-node,
+  .how-verify[data-phase='result'] .anim-verify-node,
+  .how-verify[data-phase='send'] .anim-verify-check,
+  .how-verify[data-phase='wait'] .anim-verify-check,
+  .how-verify[data-phase='result'] .anim-verify-check {
+    animation: none;
+  }
+  .how-verify[data-phase='send'] [data-step='1'] .anim-verify-node,
+  .how-verify[data-phase='wait'] [data-step='2'] .anim-verify-node,
+  .how-verify[data-phase='wait'] [data-step='3'] .anim-verify-node,
+  .how-verify[data-phase='result'] [data-step='4'] .anim-verify-node {
+    border-color: var(--primary);
+    background-color: color-mix(in oklch, var(--primary) 12%, var(--background));
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 16%, transparent);
+  }
+  .how-verify[data-phase='result'] .anim-verify-check {
+    opacity: 1;
+    transform: none;
   }
 
   /* Stagger helpers — apply on a parent or sibling row. */
@@ -313,12 +432,20 @@
   .anim-scale-in,
   .anim-blob,
   .anim-shimmer,
-  .anim-scan {
+  .anim-scan,
+  .anim-verify-signal,
+  .anim-verify-node,
+  .anim-verify-caret,
+  .anim-verify-scan,
+  .anim-verify-check {
     animation: none !important;
   }
   .reveal {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+  .how-verify .animate-ping {
+    animation: none !important;
   }
 }

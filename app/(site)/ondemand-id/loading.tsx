@@ -32,29 +32,45 @@ export default function Loading() {
 
         {/* Sidebar skeleton */}
         <aside className="flex flex-col gap-4">
-          <div className="rounded-xl border border-border bg-secondary/40 p-6 space-y-4">
-            <Skeleton className="h-6 w-48" />
-            <div className="flex flex-col gap-3">
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="space-y-2 border-b border-border/70 px-6 pb-4 pt-6">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+            <div className="flex flex-col gap-4 px-6 py-5">
               <div className="flex gap-3">
-                <Skeleton className="size-6 shrink-0 rounded-full" />
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="size-9 shrink-0 rounded-lg" />
+                <div className="w-full space-y-2 pt-0.5">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
               </div>
               <div className="flex gap-3">
-                <Skeleton className="size-6 shrink-0 rounded-full" />
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="size-9 shrink-0 rounded-lg" />
+                <div className="w-full space-y-2 pt-0.5">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
               </div>
               <div className="flex gap-3">
-                <Skeleton className="size-6 shrink-0 rounded-full" />
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="size-9 shrink-0 rounded-lg" />
+                <div className="w-full space-y-2 pt-0.5">
+                  <Skeleton className="h-4 w-44" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
               </div>
               <div className="flex gap-3">
-                <Skeleton className="size-6 shrink-0 rounded-full" />
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="size-9 shrink-0 rounded-lg" />
+                <div className="w-full space-y-2 pt-0.5">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
               </div>
-              <div className="flex gap-3">
-                <Skeleton className="size-6 shrink-0 rounded-full" />
-                <Skeleton className="h-4 w-full" />
-              </div>
+            </div>
+            <div className="flex justify-between border-t border-border/70 px-6 py-3.5">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-3 w-20" />
             </div>
           </div>
 

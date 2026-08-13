@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { HowVerificationWorks } from '@/components/verification/how-verification-works';
 import { VerificationForm } from '@/components/verification/verification-form';
 import {
   VerificationStatus,
@@ -152,30 +153,7 @@ export function VerificationClient({
       </div>
 
       <aside className="flex flex-col gap-4">
-        <div className="rounded-xl border border-border bg-secondary/40 p-6">
-          <h2 className="font-serif text-lg font-semibold tracking-tight">
-            How verification works
-          </h2>
-          <ol className="mt-4 flex flex-col gap-3 text-sm">
-            <Step n={1}>
-              We validate the IDCONNECTION code against active customers.
-            </Step>
-            <Step n={2}>
-              An audit record is created with status{' '}
-              <code className="font-mono text-xs">initiated</code>.
-            </Step>
-            <Step n={3}>
-              iVALT dispatches a push notification to the user&apos;s mobile
-              device.
-            </Step>
-            <Step n={4}>
-              The user authenticates with face or fingerprint biometrics.
-            </Step>
-            <Step n={5}>
-              We confirm the user's response and show the result.
-            </Step>
-          </ol>
-        </div>
+        <HowVerificationWorks stateKind={state.kind} />
 
         {demoMode && (
           <div className="rounded-xl border border-border bg-card p-6">
@@ -200,17 +178,6 @@ export function VerificationClient({
         )}
       </aside>
     </div>
-  );
-}
-
-function Step({ n, children }: { n: number; children: React.ReactNode }) {
-  return (
-    <li className="flex gap-3">
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 font-mono text-xs font-semibold text-primary">
-        {n}
-      </span>
-      <p className="text-muted-foreground leading-relaxed">{children}</p>
-    </li>
   );
 }
 
