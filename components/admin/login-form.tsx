@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardHeader,
@@ -17,6 +18,9 @@ import { ShieldCheck, Smartphone, Fingerprint, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
 type LoginPhase = 'idle' | 'sending' | 'polling' | 'success' | 'failed';
+
+const STATUS_CONTENT_CLASS =
+  'flex min-h-[300px] flex-col items-center justify-center gap-4 py-10';
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -93,14 +97,14 @@ export function AdminLoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-6 py-12 sm:px-8">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+        <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10">
             <ShieldCheck className="size-7 text-primary" />
           </div>
-          <div>
+          <div className="flex flex-col gap-1.5">
             <h1 className="font-serif text-2xl font-semibold tracking-tight">
               Admin Dashboard
             </h1>
@@ -108,7 +112,7 @@ export function AdminLoginForm() {
           </div>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="w-full py-6 shadow-lg">
           {phase === 'idle' && (
             <>
               <CardHeader>
@@ -121,34 +125,44 @@ export function AdminLoginForm() {
                   authentication request on your iVALT app.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Mobile Number</label>
-                  <div className="flex gap-2">
+              <CardContent className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="mobile" className="text-sm font-medium">
+                    Mobile number
+                  </Label>
+                  <div className="flex gap-3">
                     <Input
+                      id="countryCode"
                       value={countryCode}
                       onChange={e => setCountryCode(e.target.value)}
-                      className="w-20 text-center"
+                      containerClassName="w-20 shrink-0"
+                      className="text-center"
                       placeholder="+91"
                       disabled
                     />
                     <Input
+                      id="mobile"
                       value={mobile}
                       onChange={e => setMobile(e.target.value)}
+                      containerClassName="min-w-0 flex-1"
                       placeholder="Mobile number"
                       inputMode="numeric"
                     />
                   </div>
                 </div>
                 {errorMessage && (
-                  <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  <div
+                    role="alert"
+                    className="rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive"
+                  >
                     {errorMessage}
                   </div>
                 )}
               </CardContent>
-              <CardFooter>
+              <CardFooter className="pt-1">
                 <Button
                   className="w-full"
+                  size="lg"
                   onClick={initiateLogin}
                   disabled={!countryCode || !mobile}
                 >
@@ -160,59 +174,51 @@ export function AdminLoginForm() {
           )}
 
           {phase === 'sending' && (
-            <CardContent className="py-12">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <Spinner className="size-8" />
-                <div>
-                  <p className="font-medium">
-                    Sending authentication request...
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Contacting iVALT servers
-                  </p>
-                </div>
+            <CardContent className={STATUS_CONTENT_CLASS}>
+              <Spinner className="size-8" />
+              <div className="flex flex-col gap-1.5">
+                <p className="font-medium">
+                  Sending authentication request...
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Contacting iVALT servers
+                </p>
               </div>
             </CardContent>
           )}
 
           {phase === 'polling' && (
-            <CardContent className="py-12">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="relative flex size-20 items-center justify-center">
-                  <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
-                  <div className="relative flex size-20 items-center justify-center rounded-full bg-primary/10">
-                    <Smartphone className="size-9 text-primary" />
-                  </div>
+            <CardContent className={STATUS_CONTENT_CLASS}>
+              <div className="relative flex size-20 items-center justify-center">
+                <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
+                <div className="relative flex size-20 items-center justify-center rounded-full bg-primary/10">
+                  <Smartphone className="size-9 text-primary" />
                 </div>
-                <div className="space-y-1">
-                  <p className="font-medium">Check your iVALT app</p>
-                  <p className="text-sm text-muted-foreground max-w-xs">
-                    A biometric authentication request has been sent to your
-                    phone. Approve it with your fingerprint or face scan.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Spinner className="size-3" />
-                  Waiting for approval...
-                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <p className="font-medium">Check your iVALT app</p>
+                <p className="mx-auto max-w-xs text-sm leading-relaxed text-muted-foreground">
+                  A biometric authentication request has been sent to your
+                  phone. Approve it with your fingerprint or face scan.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Spinner className="size-3" />
+                Waiting for approval...
               </div>
             </CardContent>
           )}
 
           {phase === 'success' && (
-            <CardContent className="py-12">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
-                  <ShieldCheck className="size-10 text-primary" />
-                </div>
-                <div className="space-y-1">
-                  <p className="font-medium text-lg">
-                    Authentication Successful
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Redirecting to dashboard...
-                  </p>
-                </div>
+            <CardContent className={STATUS_CONTENT_CLASS}>
+              <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
+                <ShieldCheck className="size-10 text-primary" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <p className="font-medium text-lg">Authentication Successful</p>
+                <p className="text-sm text-muted-foreground">
+                  Redirecting to dashboard...
+                </p>
               </div>
             </CardContent>
           )}
@@ -232,6 +238,7 @@ export function AdminLoginForm() {
               <CardFooter>
                 <Button
                   className="w-full"
+                  size="lg"
                   variant="outline"
                   onClick={resetLogin}
                 >
@@ -242,7 +249,7 @@ export function AdminLoginForm() {
           )}
         </Card>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="mt-8 px-2 text-center text-xs leading-relaxed text-muted-foreground">
           Authorized admin access only. All login attempts are logged.
         </p>
       </div>
