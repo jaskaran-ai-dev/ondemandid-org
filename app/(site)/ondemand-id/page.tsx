@@ -41,7 +41,7 @@ export default function OnDemandIdPage() {
       </header>
 
       <div className="mt-12">
-        <VerificationClient />
+        <VerificationClient demoMode={process.env.DEMO_MODE === 'true'} />
       </div>
     </div>
   );

@@ -12,7 +12,11 @@ import type { VerifyValues } from '@/lib/validation';
 
 const MAX_ATTEMPTS = 60; // 2 minutes (2s polling x 60)
 
-export function VerificationClient() {
+export function VerificationClient({
+  demoMode = false,
+}: {
+  demoMode?: boolean;
+}) {
   const [state, setState] = useState<VerificationState>({ kind: 'idle' });
   const [lastValues, setLastValues] = useState<VerifyValues | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -173,25 +177,27 @@ export function VerificationClient() {
           </ol>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6">
-          <h2 className="text-sm font-semibold">Demo IDCONNECTION codes</h2>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Try these codes to see different states. Any 4–12 alphanumeric code
-            is accepted in the demo.
-          </p>
-          <ul className="mt-4 flex flex-col gap-2 text-xs">
-            <DemoCode code="ACME7421" hint="Approved by user" />
-            <DemoCode code="DEMO1234" hint="Approved by user" />
-            <DemoCode
-              code="MISSING01"
-              hint="Returns not_found (user not registered)"
-            />
-            <DemoCode
-              code="ACME7421"
-              hint="With mobile ending 0000 → user denies"
-            />
-          </ul>
-        </div>
+        {demoMode && (
+          <div className="rounded-xl border border-border bg-card p-6">
+            <h2 className="text-sm font-semibold">Demo IDCONNECTION codes</h2>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              Try these codes to see different states. Any 4–12 alphanumeric
+              code is accepted in the demo.
+            </p>
+            <ul className="mt-4 flex flex-col gap-2 text-xs">
+              <DemoCode code="ACME7421" hint="Approved by user" />
+              <DemoCode code="DEMO1234" hint="Approved by user" />
+              <DemoCode
+                code="MISSING01"
+                hint="Returns not_found (user not registered)"
+              />
+              <DemoCode
+                code="ACME7421"
+                hint="With mobile ending 0000 → user denies"
+              />
+            </ul>
+          </div>
+        )}
       </aside>
     </div>
   );
