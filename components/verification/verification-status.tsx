@@ -92,12 +92,10 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         )}
         {address && <DetailsRow label="Location" value={address} />}
         <div className="my-2 border-t border-border/60" />
-        <DetailsRow label="Request ID" value={state.requestId} mono />
         <DetailsRow label="IDCONNECTION" value={state.idConnection} mono />
         {idConnection && (
           <DetailsRow label="ID Connection" value={idConnection} mono />
         )}
-        <DetailsRow label="iVALT status" value="200 · authenticated" mono />
         <Actions onReset={onReset} primaryLabel="Verify another user" />
       </Frame>
     );
@@ -111,12 +109,6 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         title="Verification denied"
         description="The user rejected the request, the token expired, or the 5-minute window elapsed."
       >
-        <DetailsRow label="Request ID" value={state.requestId} mono />
-        <DetailsRow
-          label="iVALT status"
-          value={`${state.ivaltStatusCode} · failed`}
-          mono
-        />
         <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Try again" />
       </Frame>
     );
@@ -130,11 +122,6 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
         title="User or IDCONNECTION not found"
         description="The IDCONNECTION code is invalid or inactive, or the user is not registered with iVALT."
       >
-        <DetailsRow
-          label="iVALT status"
-          value={`${state.ivaltStatusCode} · not_found`}
-          mono
-        />
         <Actions
           onReset={onReset}
           onRetry={onRetry}
@@ -212,20 +199,13 @@ function PendingPanel({
       </div>
 
       <div className="mt-5">
-        <Progress value={progress} aria-label="Polling progress" />
-        <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            Polling /api/status/{state.requestId} every 2s ·{' '}
-            <span className="font-mono text-foreground">
-              {state.attempt}/{state.maxAttempts}
-            </span>
-          </span>
-          <span className="font-mono">HTTP {state.ivaltStatusCode}</span>
-        </div>
+        <Progress value={progress} aria-label="Verification progress" />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Most users approve in under 10 seconds.
+        </p>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
-        <DetailsRow label="Request ID" value={state.requestId} mono boxed />
+      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-2">
         <DetailsRow
           label="IDCONNECTION"
           value={state.idConnection}
@@ -240,10 +220,10 @@ function PendingPanel({
         />
       </div>
 
-      <div className="mt-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+      <div className="mt-5 flex items-start justify-between gap-3 sm:items-center">
         <p className="text-xs text-muted-foreground">
-          Most users approve in under 10 seconds. Polling will continue for up
-          to 5 minutes.
+          The user can also be enabled to approve via a secure link on their
+          device.
         </p>
         <Button variant="outline" size="sm" onClick={onReset}>
           <XCircle className="mr-1 size-4" aria-hidden />

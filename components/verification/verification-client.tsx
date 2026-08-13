@@ -168,7 +168,7 @@ export function VerificationClient() {
               The user authenticates with face or fingerprint biometrics.
             </Step>
             <Step n={5}>
-              We poll for the result every 2 seconds for up to 2 minutes.
+              We confirm the user's response and show the result.
             </Step>
           </ol>
         </div>
