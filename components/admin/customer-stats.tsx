@@ -4,7 +4,7 @@ import {
   Card,
   CardContent,
 } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminStats } from '@/hooks/use-admin-stats';
 import {
   Users,
@@ -50,10 +50,17 @@ export function CustomerStats() {
   if (isLoading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map(i => (
+        {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i}>
-            <CardContent className="flex items-center justify-center p-4">
-              <Spinner className="size-5" />
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-12" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+                <Skeleton className="size-10 rounded-lg" />
+              </div>
             </CardContent>
           </Card>
         ))}

@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -122,8 +122,35 @@ export function CustomersTable() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <Spinner className="size-6" />
+            <div className="p-0">
+              <div className="border-b px-4 py-3">
+                <div className="grid grid-cols-7 gap-4">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <Skeleton key={i} className="h-4" />
+                  ))}
+                </div>
+              </div>
+              <div className="divide-y">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="grid grid-cols-7 gap-4 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="size-4 rounded" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                    <Skeleton className="h-5 w-24 rounded" />
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-4 w-20" />
+                    <div className="flex justify-end">
+                      <Skeleton className="h-8 w-20 rounded-md" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : customers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">

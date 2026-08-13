@@ -14,9 +14,13 @@ export default function AdminSettingsLoading() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="space-y-2">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-4 w-80 max-w-full" />
+      <div>
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">
+          Settings
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          System configuration and admin account information.
+        </p>
       </div>
 
       {/* Settings cards */}

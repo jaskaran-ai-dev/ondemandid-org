@@ -9,9 +9,13 @@ export default function AdminDashboardLoading() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <Skeleton className="h-8 w-56" />
-        <Skeleton className="h-4 w-72" />
+      <div>
+        <h1 className="font-serif text-2xl font-semibold tracking-tight">
+          Dashboard Overview
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Monitor customers and verification activity at a glance.
+        </p>
       </div>
 
       {/* Stat cards */}
