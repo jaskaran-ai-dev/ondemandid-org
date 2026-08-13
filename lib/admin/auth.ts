@@ -33,6 +33,7 @@ export function createSessionToken(): string {
   const payload = {
     sub: 'admin',
     mobile: ADMIN_MOBILE,
+    jti: crypto.randomBytes(16).toString('hex'), // random nonce guarantees uniqueness
     exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE,
   };
   const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
@@ -102,11 +103,10 @@ export async function isAdminAuthenticated(): Promise<boolean> {
  */
 export function setSessionCookie(response: Response): void {
   const token = createSessionToken();
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   response.headers.append(
     'Set-Cookie',
-    `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure=${
-      process.env.NODE_ENV === 'production'
-    }; SameSite=Strict; Max-Age=${SESSION_MAX_AGE}`
+    `${COOKIE_NAME}=${token}; Path=/; HttpOnly${secure}; SameSite=Strict; Max-Age=${SESSION_MAX_AGE}`
   );
 }
 
@@ -114,11 +114,10 @@ export function setSessionCookie(response: Response): void {
  * Clear the admin session cookie on the response.
  */
 export function clearSessionCookie(response: Response): void {
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   response.headers.append(
     'Set-Cookie',
-    `${COOKIE_NAME}=; Path=/; HttpOnly; Secure=${
-      process.env.NODE_ENV === 'production'
-    }; SameSite=Strict; Max-Age=0`
+    `${COOKIE_NAME}=; Path=/; HttpOnly${secure}; SameSite=Strict; Max-Age=0`
   );
 }
 
