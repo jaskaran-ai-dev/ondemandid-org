@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { getAuthResult, mapIvaltStatus } from '@/lib/ivalt';
 import { simRequests } from '@/lib/sim-store';
 
@@ -54,7 +54,12 @@ async function handleProductionMode(id: string) {
   const requests = await db
     .select()
     .from(schema.ondemandRequests)
-    .where(eq(schema.ondemandRequests.id, id))
+    .where(
+      and(
+        eq(schema.ondemandRequests.id, id),
+        isNull(schema.ondemandRequests.deletedAt)
+      )
+    )
     .limit(1);
 
   if (requests.length === 0) {

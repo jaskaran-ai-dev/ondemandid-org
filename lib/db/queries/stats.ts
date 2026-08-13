@@ -1,5 +1,5 @@
 import { db, schema } from '@/lib/db';
-import { eq, sql, desc } from 'drizzle-orm';
+import { and, eq, isNull, sql, desc } from 'drizzle-orm';
 
 export interface DashboardStats {
   totalCustomers: number;
@@ -81,34 +81,66 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   const [totalCustomers] = await db
     .select({ count: sql<number>`count(*)::int` })
-    .from(schema.customers);
+    .from(schema.customers)
+    .where(isNull(schema.customers.deletedAt));
   const [activeCustomers] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.customers)
-    .where(eq(schema.customers.status, 'active'));
+    .where(
+      and(
+        eq(schema.customers.status, 'active'),
+        isNull(schema.customers.deletedAt)
+      )
+    );
   const [pendingCustomers] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.customers)
-    .where(eq(schema.customers.status, 'pending'));
+    .where(
+      and(
+        eq(schema.customers.status, 'pending'),
+        isNull(schema.customers.deletedAt)
+      )
+    );
   const [inactiveCustomers] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.customers)
-    .where(eq(schema.customers.status, 'inactive'));
+    .where(
+      and(
+        eq(schema.customers.status, 'inactive'),
+        isNull(schema.customers.deletedAt)
+      )
+    );
   const [totalRequests] = await db
     .select({ count: sql<number>`count(*)::int` })
-    .from(schema.ondemandRequests);
+    .from(schema.ondemandRequests)
+    .where(isNull(schema.ondemandRequests.deletedAt));
   const [authenticatedRequests] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.ondemandRequests)
-    .where(eq(schema.ondemandRequests.status, 'authenticated'));
+    .where(
+      and(
+        eq(schema.ondemandRequests.status, 'authenticated'),
+        isNull(schema.ondemandRequests.deletedAt)
+      )
+    );
   const [failedRequests] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.ondemandRequests)
-    .where(eq(schema.ondemandRequests.status, 'failed'));
+    .where(
+      and(
+        eq(schema.ondemandRequests.status, 'failed'),
+        isNull(schema.ondemandRequests.deletedAt)
+      )
+    );
   const [pendingRequests] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.ondemandRequests)
-    .where(sql`${schema.ondemandRequests.status} IN ('pending', 'initiated')`);
+    .where(
+      and(
+        sql`${schema.ondemandRequests.status} IN ('pending', 'initiated')`,
+        isNull(schema.ondemandRequests.deletedAt)
+      )
+    );
 
   const recentRequests = await db
     .select({
@@ -119,6 +151,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       createdAt: schema.ondemandRequests.createdAt,
     })
     .from(schema.ondemandRequests)
+    .where(isNull(schema.ondemandRequests.deletedAt))
     .orderBy(desc(schema.ondemandRequests.createdAt))
     .limit(5);
 

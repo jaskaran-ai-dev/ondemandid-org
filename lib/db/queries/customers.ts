@@ -1,5 +1,5 @@
 import { db, schema } from '@/lib/db';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, isNull, sql } from 'drizzle-orm';
 
 export interface Customer {
   id: string | number;
@@ -35,6 +35,8 @@ interface DemoCustomer {
   notes: string | null;
   createdAt: number;
 }
+
+const deletedDemoCustomerIds = new Set<string>();
 
 const demoCustomers: DemoCustomer[] = [
   {
@@ -116,6 +118,7 @@ export async function getCustomers(
 
   if (isDemo) {
     let list = [...demoCustomers] as Customer[];
+    list = list.filter(c => !deletedDemoCustomerIds.has(String(c.id)));
     if (status && status !== 'all')
       list = list.filter(c => c.status === status);
     if (search) {
@@ -133,6 +136,7 @@ export async function getCustomers(
     const allCustomers = await db
       .select()
       .from(schema.customers)
+      .where(isNull(schema.customers.deletedAt))
       .orderBy(desc(schema.customers.createdAt));
 
     let list = allCustomers;
@@ -232,4 +236,31 @@ export async function createCustomer(
     .returning();
 
   return { id: customer[0].id, ok: true };
+}
+
+export async function deleteCustomer(
+  id: string | number
+): Promise<{ ok: boolean }> {
+  const isDemo = process.env.DEMO_MODE === 'true';
+
+  if (isDemo) {
+    deletedDemoCustomerIds.add(String(id));
+    return { ok: true };
+  }
+
+  const deleteData: Record<string, unknown> = {};
+
+  if (process.env.DB_TYPE === 'neon') {
+    deleteData.deletedAt = new Date();
+  } else {
+    deleteData.deletedAt = sql`${Math.floor(Date.now() / 1000)}`;
+  }
+
+  const deleted = await db
+    .update(schema.customers)
+    .set(deleteData)
+    .where(eq(schema.customers.id, id))
+    .returning();
+  if (deleted.length === 0) throw new Error('Customer not found');
+  return { ok: true };
 }

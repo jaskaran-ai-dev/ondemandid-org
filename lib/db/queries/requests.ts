@@ -1,5 +1,5 @@
 import { db, schema } from '@/lib/db';
-import { desc, sql } from 'drizzle-orm';
+import { desc, eq, isNull, sql } from 'drizzle-orm';
 
 export interface VerificationRequest {
   id: string | number;
@@ -33,6 +33,8 @@ interface DemoRequest {
   createdAt: number;
   completedAt: number | null;
 }
+
+const deletedDemoRequestIds = new Set<string>();
 
 const demoRequests: DemoRequest[] = [
   {
@@ -125,6 +127,7 @@ export async function getRequests(
 
   if (isDemo) {
     let list = [...demoRequests] as VerificationRequest[];
+    list = list.filter(r => !deletedDemoRequestIds.has(String(r.id)));
     if (status && status !== 'all') {
       if (status === 'pending') {
         list = list.filter(
@@ -139,6 +142,7 @@ export async function getRequests(
     const allRequests = await db
       .select()
       .from(schema.ondemandRequests)
+      .where(isNull(schema.ondemandRequests.deletedAt))
       .orderBy(desc(schema.ondemandRequests.createdAt));
 
     let list = allRequests;
@@ -164,4 +168,31 @@ export async function getRequests(
   const requests = filtered.slice(offset, offset + pageSize);
 
   return { requests, total };
+}
+
+export async function deleteRequest(
+  id: string | number
+): Promise<{ ok: boolean }> {
+  const isDemo = process.env.DEMO_MODE === 'true';
+
+  if (isDemo) {
+    deletedDemoRequestIds.add(String(id));
+    return { ok: true };
+  }
+
+  const deleteData: Record<string, unknown> = {};
+
+  if (process.env.DB_TYPE === 'neon') {
+    deleteData.deletedAt = new Date();
+  } else {
+    deleteData.deletedAt = sql`${Math.floor(Date.now() / 1000)}`;
+  }
+
+  const deleted = await db
+    .update(schema.ondemandRequests)
+    .set(deleteData)
+    .where(eq(schema.ondemandRequests.id, id))
+    .returning();
+  if (deleted.length === 0) throw new Error('Request not found');
+  return { ok: true };
 }

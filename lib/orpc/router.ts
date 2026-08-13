@@ -2,14 +2,27 @@ import { ORPCError } from '@orpc/server';
 import { z } from 'zod';
 import { authedProcedure } from './context';
 import { getDashboardStats } from '@/lib/db/queries/stats';
-import { getCustomers, updateCustomer, createCustomer } from '@/lib/db/queries/customers';
-import { getRequests } from '@/lib/db/queries/requests';
+import {
+  getCustomers,
+  updateCustomer,
+  createCustomer,
+  deleteCustomer,
+} from '@/lib/db/queries/customers';
+import { getRequests, deleteRequest } from '@/lib/db/queries/requests';
 
 const customerUpdateSchema = z.object({
   id: z.string(),
   status: z.enum(['pending', 'active', 'inactive']).optional(),
   idConnection: z.string().max(50).optional(),
   notes: z.string().max(2000).optional(),
+});
+
+const customerDeleteSchema = z.object({
+  id: z.string(),
+});
+
+const requestDeleteSchema = z.object({
+  id: z.string(),
 });
 
 const customerCreateSchema = z.object({
@@ -126,15 +139,51 @@ export const adminRequestsList = authedProcedure
     }
   });
 
+export const adminCustomerDelete = authedProcedure
+  .input(customerDeleteSchema)
+  .handler(async ({ input }) => {
+    try {
+      await deleteCustomer(input.id);
+      return { ok: true };
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Customer not found') {
+        throw new ORPCError('NOT_FOUND', { message: 'Customer not found' });
+      }
+      console.error('Admin customer delete error:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to delete customer',
+      });
+    }
+  });
+
+export const adminRequestDelete = authedProcedure
+  .input(requestDeleteSchema)
+  .handler(async ({ input }) => {
+    try {
+      await deleteRequest(input.id);
+      return { ok: true };
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Request not found') {
+        throw new ORPCError('NOT_FOUND', { message: 'Request not found' });
+      }
+      console.error('Admin request delete error:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to delete request',
+      });
+    }
+  });
+
 export const adminRouter = {
   stats: adminStats,
   customers: {
     list: adminCustomersList,
     update: adminCustomerUpdate,
     create: adminCustomerCreate,
+    delete: adminCustomerDelete,
   },
   requests: {
     list: adminRequestsList,
+    delete: adminRequestDelete,
   },
 };
 
