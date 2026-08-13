@@ -29,7 +29,7 @@ declare global {
     | undefined;
 }
 
-const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
+export const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
   globalThis.__adminLoginAttempts ?? new Map();
 if (!globalThis.__adminLoginAttempts) {
   globalThis.__adminLoginAttempts = loginAttempts;

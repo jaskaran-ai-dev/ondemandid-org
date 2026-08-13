@@ -8,7 +8,7 @@ declare global {
   var __adminLoginResolve: Map<string, number> | undefined;
 }
 
-const resolveAt: Map<string, number> =
+export const resolveAt: Map<string, number> =
   globalThis.__adminLoginResolve ?? new Map();
 if (!globalThis.__adminLoginResolve) {
   globalThis.__adminLoginResolve = resolveAt;
@@ -22,8 +22,11 @@ declare global {
     | undefined;
 }
 
-const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
+export const loginAttempts: Map<string, { countryCode: string; mobile: string; createdAt: number }> =
   globalThis.__adminLoginAttempts ?? new Map();
+if (!globalThis.__adminLoginAttempts) {
+  globalThis.__adminLoginAttempts = loginAttempts;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -39,6 +42,14 @@ export async function GET(request: Request) {
   const isDemoMode = process.env.DEMO_MODE === 'true';
 
   if (isDemoMode) {
+    // In demo mode, requestId must be a known login attempt
+    if (!loginAttempts.has(requestId) && !resolveAt.has(requestId)) {
+      return NextResponse.json(
+        { error: 'Invalid or expired login session' },
+        { status: 400 }
+      );
+    }
+
     // Simulate: resolve after 4 seconds
     if (!resolveAt.has(requestId)) {
       resolveAt.set(requestId, Date.now() + 4000);
@@ -59,6 +70,7 @@ export async function GET(request: Request) {
     });
     setSessionCookie(response);
     resolveAt.delete(requestId);
+    loginAttempts.delete(requestId);
     return response;
   }
 
