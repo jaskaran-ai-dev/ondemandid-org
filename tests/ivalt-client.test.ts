@@ -41,7 +41,7 @@ describe('triggerAuthRequest', () => {
     vi.unstubAllGlobals();
   });
 
-  it('posts id_connection and full mobile to /biometric-auth-request', async () => {
+  it('posts id_connection, request_from, and full mobile to /biometric-auth-request', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 202,
@@ -65,6 +65,7 @@ describe('triggerAuthRequest', () => {
         }),
         body: JSON.stringify({
           id_connection: 'ACME7421',
+          requestFrom: 'ACME7421',
           mobile: '+15550100123',
         }),
       })

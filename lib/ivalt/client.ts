@@ -102,6 +102,7 @@ export async function triggerAuthRequest(params: {
 }): Promise<IvaltAuthRequestResponse> {
   return ivaltRequest<IvaltAuthRequestResponse>('/biometric-auth-request', {
     id_connection: params.idConnection,
+    requestFrom: params.idConnection,
     mobile: `${params.countryCode}${params.mobile}`,
   });
 }
