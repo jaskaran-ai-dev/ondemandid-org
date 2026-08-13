@@ -32,7 +32,7 @@ const COUNTRY_BY_ISO = Object.fromEntries(
 export function CustomerCreateDialog() {
   const [open, setOpen] = useState(false);
   const createMutation = useAdminCreateCustomer();
-  
+
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -85,7 +85,7 @@ export function CustomerCreateDialog() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     createMutation.mutate(
@@ -124,147 +124,182 @@ export function CustomerCreateDialog() {
           Create Customer
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Customer</DialogTitle>
-          <DialogDescription>
-            Add a new enterprise customer to the platform. They will start in
-            pending status until you provision their IDCONNECTION code.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-lg">
+        <div className="flex max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Create New Customer</DialogTitle>
+            <DialogDescription>
+              Add a new enterprise customer to the platform. They will start in
+              pending status until you provision their IDCONNECTION code.
+            </DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="space-y-2">
-            <label htmlFor="companyName" className="text-sm font-medium">Company Name *</label>
-            <Input
-              id="companyName"
-              value={formData.companyName}
-              onChange={e => setFormData({ ...formData, companyName: e.target.value })}
-              placeholder="e.g., Acme Corporation"
-              className={errors.companyName ? 'border-destructive' : ''}
-            />
-            {errors.companyName && (
-              <p className="text-xs text-destructive">{errors.companyName}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="contactName" className="text-sm font-medium">Contact Name *</label>
-            <Input
-              id="contactName"
-              value={formData.contactName}
-              onChange={e => setFormData({ ...formData, contactName: e.target.value })}
-              placeholder="e.g., John Smith"
-              className={errors.contactName ? 'border-destructive' : ''}
-            />
-            {errors.contactName && (
-              <p className="text-xs text-destructive">{errors.contactName}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">Email *</label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              placeholder="e.g., john@acme.com"
-              className={errors.email ? 'border-destructive' : ''}
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-1 space-y-2">
-              <label htmlFor="countryCode" className="text-sm font-medium">Country</label>
-              <Select
-                value={formData.countryCode}
-                onValueChange={value => setFormData({ ...formData, countryCode: value })}
-              >
-                <SelectTrigger id="countryCode">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRY_CODES.map(country => (
-                    <SelectItem key={country.iso} value={country.iso}>
-                      {country.flag} {country.code}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="col-span-2 space-y-2">
-              <label htmlFor="mobile" className="text-sm font-medium">Mobile Number *</label>
+          <form
+            onSubmit={handleSubmit}
+            className="min-h-0 flex-1 space-y-4 overflow-y-auto py-0.5 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <div className="space-y-2">
+              <label htmlFor="companyName" className="text-sm font-medium">
+                Company Name *
+              </label>
               <Input
-                id="mobile"
-                value={formData.mobile}
-                onChange={e => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '') })}
-                placeholder="e.g., 9530654704"
-                className={errors.mobile ? 'border-destructive' : ''}
+                id="companyName"
+                value={formData.companyName}
+                onChange={e =>
+                  setFormData({ ...formData, companyName: e.target.value })
+                }
+                placeholder="e.g., Acme Corporation"
+                className={errors.companyName ? 'border-destructive' : ''}
               />
-              {errors.mobile && (
-                <p className="text-xs text-destructive">{errors.mobile}</p>
+              {errors.companyName && (
+                <p className="text-xs text-destructive">{errors.companyName}</p>
               )}
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label htmlFor="initialUsers" className="text-sm font-medium">Initial Users *</label>
-            <Input
-              id="initialUsers"
-              type="number"
-              min="1"
-              max="100"
-              value={formData.initialUsers}
-              onChange={e => setFormData({ ...formData, initialUsers: e.target.value })}
-              className={errors.initialUsers ? 'border-destructive' : ''}
-            />
-            {errors.initialUsers && (
-              <p className="text-xs text-destructive">{errors.initialUsers}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Number of users to onboard (1–100 for trial)
-            </p>
-          </div>
+            <div className="space-y-2">
+              <label htmlFor="contactName" className="text-sm font-medium">
+                Contact Name *
+              </label>
+              <Input
+                id="contactName"
+                value={formData.contactName}
+                onChange={e =>
+                  setFormData({ ...formData, contactName: e.target.value })
+                }
+                placeholder="e.g., John Smith"
+                className={errors.contactName ? 'border-destructive' : ''}
+              />
+              {errors.contactName && (
+                <p className="text-xs text-destructive">{errors.contactName}</p>
+              )}
+            </div>
 
-          <div className="space-y-2">
-            <label htmlFor="notes" className="text-sm font-medium">Notes</label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={e => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Optional notes about this customer..."
-              rows={3}
-              maxLength={2000}
-            />
-            <p className="text-xs text-muted-foreground">
-              {formData.notes.length}/2000 characters
-            </p>
-          </div>
-        </form>
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
+                Email *
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={e =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="e.g., john@acme.com"
+                className={errors.email ? 'border-destructive' : ''}
+              />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email}</p>
+              )}
+            </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={createMutation.isPending}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={createMutation.isPending}
-          >
-            {createMutation.isPending ? (
-              <Spinner className="size-4" />
-            ) : (
-              'Create Customer'
-            )}
-          </Button>
-        </DialogFooter>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-1 space-y-2">
+                <label htmlFor="countryCode" className="text-sm font-medium">
+                  Country
+                </label>
+                <Select
+                  value={formData.countryCode}
+                  onValueChange={value =>
+                    setFormData({ ...formData, countryCode: value })
+                  }
+                >
+                  <SelectTrigger id="countryCode">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRY_CODES.map(country => (
+                      <SelectItem key={country.iso} value={country.iso}>
+                        {country.flag} {country.code}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-2 space-y-2">
+                <label htmlFor="mobile" className="text-sm font-medium">
+                  Mobile Number *
+                </label>
+                <Input
+                  id="mobile"
+                  value={formData.mobile}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      mobile: e.target.value.replace(/\D/g, ''),
+                    })
+                  }
+                  placeholder="e.g., 9530654704"
+                  className={errors.mobile ? 'border-destructive' : ''}
+                />
+                {errors.mobile && (
+                  <p className="text-xs text-destructive">{errors.mobile}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="initialUsers" className="text-sm font-medium">
+                Initial Users *
+              </label>
+              <Input
+                id="initialUsers"
+                type="number"
+                min="1"
+                max="100"
+                value={formData.initialUsers}
+                onChange={e =>
+                  setFormData({ ...formData, initialUsers: e.target.value })
+                }
+                className={errors.initialUsers ? 'border-destructive' : ''}
+              />
+              {errors.initialUsers && (
+                <p className="text-xs text-destructive">
+                  {errors.initialUsers}
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Number of users to onboard (1–100 for trial)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="notes" className="text-sm font-medium">
+                Notes
+              </label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={e =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+                placeholder="Optional notes about this customer..."
+                rows={3}
+                maxLength={2000}
+              />
+              <p className="text-xs text-muted-foreground">
+                {formData.notes.length}/2000 characters
+              </p>
+            </div>
+          </form>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={createMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={createMutation.isPending}>
+              {createMutation.isPending ? (
+                <Spinner className="size-4" />
+              ) : (
+                'Create Customer'
+              )}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
