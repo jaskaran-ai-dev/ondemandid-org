@@ -144,13 +144,11 @@ export function VerificationClient({
             submitting={verifyMutation.isPending}
           />
         ) : (
-          <div className="p-6 md:p-8">
-            <VerificationStatus
-              state={state}
-              onReset={handleReset}
-              onRetry={handleRetry}
-            />
-          </div>
+          <VerificationStatus
+            state={state}
+            onReset={handleReset}
+            onRetry={handleRetry}
+          />
         )}
       </div>
 

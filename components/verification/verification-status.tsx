@@ -3,16 +3,14 @@
 import { useEffect, useState } from 'react';
 import {
   AlertCircle,
-  CheckCircle2,
   Loader2,
   RefreshCcw,
   ScanFace,
-  ShieldAlert,
-  ShieldX,
   XCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 export type VerificationState =
   | { kind: 'idle' }
@@ -50,12 +48,16 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
 
   if (state.kind === 'submitting') {
     return (
-      <Frame
-        tone="primary"
-        icon={<Loader2 className="size-6 animate-spin" />}
-        title="Sending verification request"
-        description="Validating IDCONNECTION and dispatching push notification…"
-      />
+      <StatusShell
+        eyebrow="Sending"
+        title="Dispatching the request"
+        description="Validating the IDCONNECTION code and sending a push to the iVALT app."
+      >
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin text-primary" aria-hidden />
+          Waiting for the mobile device…
+        </div>
+      </StatusShell>
     );
   }
 
@@ -64,87 +66,191 @@ export function VerificationStatus({ state, onReset, onRetry }: Props) {
   }
 
   if (state.kind === 'authenticated') {
-    const details = state.details;
-    const name = details?.name as string | undefined;
-    const email = details?.email as string | undefined;
-    const mobile = details?.mobile as string | undefined;
-    const countryCode = details?.country_code as string | undefined;
-    const address = details?.address as string | undefined;
-    const idConnection = details?.id_connection as string | undefined;
-
-    return (
-      <Frame
-        tone="success"
-        icon={<CheckCircle2 className="size-6" />}
-        title="Identity verified"
-        description={`Biometric authentication completed in ${(
-          state.durationMs / 1000
-        ).toFixed(1)}s.`}
-      >
-        {name && <DetailsRow label="Name" value={name} />}
-        {email && <DetailsRow label="Email" value={email} />}
-        {mobile && (
-          <DetailsRow
-            label="Mobile"
-            value={`${countryCode || ''} ${mobile}`.trim()}
-            mono
-          />
-        )}
-        {address && <DetailsRow label="Location" value={address} />}
-        <div className="my-2 border-t border-border/60" />
-        <DetailsRow label="IDCONNECTION" value={state.idConnection} mono />
-        {idConnection && (
-          <DetailsRow label="ID Connection" value={idConnection} mono />
-        )}
-        <Actions onReset={onReset} primaryLabel="Verify another user" />
-      </Frame>
-    );
+    return <AuthenticatedPanel state={state} onReset={onReset} />;
   }
 
   if (state.kind === 'failed') {
     return (
-      <Frame
+      <StatusShell
         tone="destructive"
-        icon={<ShieldX className="size-6" />}
+        eyebrow="Denied"
         title="Verification denied"
-        description="The user rejected the request, the token expired, or the 5-minute window elapsed."
+        description="The user rejected the request, the token expired, or the five-minute window elapsed."
+        footer={
+          <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Try again" />
+        }
       >
-        <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Try again" />
-      </Frame>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          No identity was confirmed. You can send the same request again, or
+          start over with a different number.
+        </p>
+      </StatusShell>
     );
   }
 
   if (state.kind === 'not_found') {
     return (
-      <Frame
+      <StatusShell
         tone="warning"
-        icon={<ShieldAlert className="size-6" />}
+        eyebrow="Not found"
         title="User or IDCONNECTION not found"
-        description="The IDCONNECTION code is invalid or inactive, or the user is not registered with iVALT."
+        description="The IDCONNECTION code is invalid or inactive, or this number is not registered with iVALT."
+        footer={
+          <Actions
+            onReset={onReset}
+            onRetry={onRetry}
+            primaryLabel="Edit details"
+          />
+        }
       >
-        <Actions
-          onReset={onReset}
-          onRetry={onRetry}
-          primaryLabel="Edit details"
-        />
-      </Frame>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Check the code and mobile number, then send the request again.
+        </p>
+      </StatusShell>
     );
   }
 
   if (state.kind === 'error') {
     return (
-      <Frame
+      <StatusShell
         tone="destructive"
-        icon={<AlertCircle className="size-6" />}
+        eyebrow="Error"
         title="Something went wrong"
         description={state.message}
+        footer={
+          <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Retry" />
+        }
       >
-        <Actions onReset={onReset} onRetry={onRetry} primaryLabel="Retry" />
-      </Frame>
+        <div className="flex items-start gap-3 text-sm text-muted-foreground">
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+          The request did not complete. Nothing was charged and no identity was
+          recorded.
+        </div>
+      </StatusShell>
     );
   }
 
   return null;
+}
+
+function AuthenticatedPanel({
+  state,
+  onReset,
+}: {
+  state: Extract<VerificationState, { kind: 'authenticated' }>;
+  onReset: () => void;
+}) {
+  const details = state.details ?? null;
+  const name = pickString(details, ['name', 'full_name']);
+  const email = pickString(details, ['email']);
+  const mobile = pickString(details, ['mobile', 'phone']);
+  const countryCode = pickString(details, ['country_code', 'countryCode']);
+  const address = pickString(details, ['address', 'location']);
+  const detailConnection = pickString(details, [
+    'id_connection',
+    'idConnection',
+  ]);
+  const phone = [countryCode, mobile].filter(Boolean).join(' ').trim();
+  const seconds = (state.durationMs / 1000).toFixed(1);
+  const showDetailConnection =
+    !!detailConnection &&
+    detailConnection.toUpperCase() !== state.idConnection.toUpperCase();
+
+  const facts = [
+    !phone && mobile
+      ? { label: 'Mobile', value: mobile, mono: true }
+      : null,
+    email ? { label: 'Email', value: email, mono: false } : null,
+    address ? { label: 'Location', value: address, mono: false } : null,
+    {
+      label: 'IDCONNECTION',
+      value: state.idConnection,
+      mono: true,
+    },
+    showDetailConnection
+      ? { label: 'ID connection', value: detailConnection, mono: true }
+      : null,
+    state.requestId
+      ? { label: 'Request', value: state.requestId, mono: true }
+      : null,
+  ].filter((row): row is { label: string; value: string; mono: boolean } =>
+    Boolean(row)
+  );
+
+  return (
+    <StatusShell
+      eyebrow="Authenticated"
+      title="Identity verified"
+      description="On-device biometrics matched. This person is who they say they are."
+      meta={
+        <div className="shrink-0 rounded-md border border-border bg-secondary/40 px-2.5 py-1.5 text-right">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Time
+          </p>
+          <p className="font-mono text-xl font-semibold leading-none tabular-nums text-foreground">
+            {seconds}
+            <span className="ml-0.5 text-xs font-medium text-muted-foreground">
+              s
+            </span>
+          </p>
+        </div>
+      }
+      footer={
+        <Button onClick={onReset} size="lg" className="w-full">
+          Verify another user
+        </Button>
+      }
+    >
+      <div
+        role="status"
+        className="anim-scale-in flex items-center gap-4 rounded-xl border border-primary/25 bg-primary/5 p-4"
+      >
+        <div
+          aria-hidden
+          className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-primary font-serif text-lg font-semibold text-primary-foreground"
+        >
+          {name ? initials(name) : <ScanFace className="size-6" />}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-serif text-xl font-semibold tracking-tight">
+            {name ?? 'Verified user'}
+          </p>
+          {phone ? (
+            <p className="mt-0.5 font-mono text-sm text-muted-foreground">
+              {phone}
+            </p>
+          ) : null}
+          <p
+            className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-primary"
+            style={{ fontFamily: 'Bespoke Stencil, sans-serif' }}
+          >
+            On-device match
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {facts.map(fact => (
+          <div
+            key={fact.label}
+            className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5"
+          >
+            <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              {fact.label}
+            </dt>
+            <dd
+              className={cn(
+                'mt-1 truncate text-sm font-semibold text-foreground',
+                fact.mono && 'font-mono text-xs tracking-wide'
+              )}
+            >
+              {fact.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </StatusShell>
+  );
 }
 
 function PendingPanel({
@@ -154,7 +260,6 @@ function PendingPanel({
   state: Extract<VerificationState, { kind: 'pending' }>;
   onReset: () => void;
 }) {
-  // Live elapsed timer
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const i = setInterval(() => setNow(Date.now()), 250);
@@ -167,169 +272,141 @@ function PendingPanel({
   const progress = Math.min(100, (state.attempt / state.maxAttempts) * 100);
 
   return (
-    <div className="rounded-xl border border-primary/40 bg-primary/5 p-6 text-foreground">
-      <div className="flex items-start gap-4">
-        <div className="relative flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <ScanFace className="size-6" aria-hidden />
-          <span
-            aria-hidden
-            className="absolute inset-0 animate-ping rounded-full bg-primary/20"
-          />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-            Awaiting biometric response
-          </p>
-          <h3 className="mt-1 font-serif text-xl font-semibold tracking-tight">
-            Push notification delivered
-          </h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            The user is reviewing the request in the iVALT mobile app. They
-            authenticate with face or fingerprint to approve.
-          </p>
-        </div>
-        <div className="hidden text-right md:block">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+    <StatusShell
+      eyebrow="Awaiting response"
+      title="Push notification delivered"
+      description="The user is reviewing the request in the iVALT app. They approve with face or fingerprint."
+      meta={
+        <div className="shrink-0 rounded-md border border-border bg-secondary/40 px-2.5 py-1.5 text-right">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             Elapsed
           </p>
-          <p className="font-mono text-2xl font-semibold tabular-nums">
+          <p className="font-mono text-xl font-semibold leading-none tabular-nums">
             {mm}:{ss}
           </p>
         </div>
-      </div>
-
-      <div className="mt-5">
-        <Progress value={progress} aria-label="Verification progress" />
-        <p className="mt-2 text-xs text-muted-foreground">
-          Most users approve in under 10 seconds.
-        </p>
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-2">
-        <DetailsRow
-          label="IDCONNECTION"
-          value={state.idConnection}
-          mono
-          boxed
+      }
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            Most users approve in under 10 seconds.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onReset}
+            className="ml-auto"
+          >
+            <XCircle className="mr-1 size-4" aria-hidden />
+            Cancel request
+          </Button>
+        </div>
+      }
+    >
+      <div className="relative mb-5 flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <ScanFace className="size-6" aria-hidden />
+        <span
+          aria-hidden
+          className="absolute inset-0 animate-ping rounded-lg bg-primary/15"
         />
-        <DetailsRow
+      </div>
+
+      <Progress value={progress} aria-label="Verification progress" />
+
+      <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Fact label="IDCONNECTION" value={state.idConnection} mono />
+        <Fact
           label="Phone"
           value={`${state.countryCode} ${state.mobile}`}
           mono
-          boxed
         />
-      </div>
-
-      <div className="mt-5 flex items-start justify-between gap-3 sm:items-center">
-        <p className="text-xs text-muted-foreground">
-          The user can also be enabled to approve via a secure link on their
-          device.
-        </p>
-        <Button variant="outline" size="sm" onClick={onReset}>
-          <XCircle className="mr-1 size-4" aria-hidden />
-          Cancel request
-        </Button>
-      </div>
-    </div>
+      </dl>
+    </StatusShell>
   );
 }
 
-type Tone = 'primary' | 'success' | 'warning' | 'destructive';
+type Tone = 'primary' | 'warning' | 'destructive';
 
-function Frame({
-  tone,
-  icon,
+function StatusShell({
+  tone = 'primary',
+  eyebrow,
   title,
   description,
+  meta,
   children,
+  footer,
 }: {
-  tone: Tone;
-  icon: React.ReactNode;
+  tone?: Tone;
+  eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
+  meta?: React.ReactNode;
   children?: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
-  const toneClasses: Record<Tone, { container: string; iconWrap: string }> = {
-    primary: {
-      container: 'border-primary/40 bg-primary/5',
-      iconWrap: 'bg-primary/10 text-primary',
-    },
-    success: {
-      container: 'border-primary/40 bg-primary/5',
-      iconWrap: 'bg-primary text-primary-foreground',
-    },
-    warning: {
-      container: 'border-accent/60 bg-accent/10',
-      iconWrap: 'bg-accent text-accent-foreground',
-    },
-    destructive: {
-      container: 'border-destructive/40 bg-destructive/5',
-      iconWrap: 'bg-destructive text-destructive-foreground',
-    },
+  const eyebrowClass: Record<Tone, string> = {
+    primary: 'text-primary',
+    warning: 'text-accent',
+    destructive: 'text-destructive',
   };
-  const t = toneClasses[tone];
+
   return (
-    <div className={`rounded-xl border ${t.container} p-6`}>
-      <div className="flex items-start gap-4">
-        <div
-          className={`flex size-12 shrink-0 items-center justify-center rounded-full ${t.iconWrap}`}
-          aria-hidden
-        >
-          {icon}
+    <div className="flex h-full min-h-0 flex-col">
+      <header className="border-b border-border/70 px-6 pb-4 pt-6 md:px-8">
+        <div className="flex items-center justify-between gap-3">
+          <p
+            className={cn(
+              'text-[11px] font-semibold uppercase tracking-[0.14em]',
+              eyebrowClass[tone]
+            )}
+          >
+            {eyebrow}
+          </p>
+          {meta}
         </div>
-        <div className="flex-1">
-          <h3 className="font-serif text-xl font-semibold tracking-tight">
-            {title}
-          </h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+        <h2 className="mt-1.5 text-balance font-serif text-lg font-semibold tracking-tight">
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
             {description}
           </p>
-        </div>
+        ) : null}
+      </header>
+      <div className="flex flex-1 flex-col justify-center px-6 py-6 md:px-8">
+        {children}
       </div>
-      {children ? (
-        <div className="mt-5 flex flex-col gap-2">{children}</div>
+      {footer ? (
+        <footer className="border-t border-border/70 px-6 py-3.5 md:px-8">
+          {footer}
+        </footer>
       ) : null}
     </div>
   );
 }
 
-function DetailsRow({
+function Fact({
   label,
   value,
   mono,
-  boxed,
 }: {
   label: string;
   value: string;
   mono?: boolean;
-  boxed?: boolean;
 }) {
-  if (boxed) {
-    return (
-      <div className="rounded-md border border-border bg-background p-2.5">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {label}
-        </p>
-        <p
-          className={`mt-0.5 truncate text-xs font-semibold ${
-            mono ? 'font-mono' : ''
-          }`}
-        >
-          {value}
-        </p>
-      </div>
-    );
-  }
   return (
-    <div className="flex items-baseline justify-between gap-2 border-b border-border/60 pb-2 text-sm last:border-b-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span
-        className={`truncate text-foreground ${
-          mono ? 'font-mono text-xs' : ''
-        }`}
+    <div className="rounded-lg border border-border bg-secondary/30 px-3 py-2.5">
+      <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p
+        className={cn(
+          'mt-1 truncate text-sm font-semibold text-foreground',
+          mono && 'font-mono text-xs tracking-wide'
+        )}
       >
         {value}
-      </span>
+      </p>
     </div>
   );
 }
@@ -344,7 +421,7 @@ function Actions({
   primaryLabel: string;
 }) {
   return (
-    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+    <div className="flex flex-col gap-2 sm:flex-row">
       <Button onClick={onReset} className="sm:flex-1">
         {primaryLabel}
       </Button>
@@ -356,4 +433,23 @@ function Actions({
       ) : null}
     </div>
   );
+}
+
+function pickString(
+  details: Record<string, unknown> | null,
+  keys: string[]
+): string | undefined {
+  if (!details) return undefined;
+  for (const key of keys) {
+    const value = details[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase();
 }
