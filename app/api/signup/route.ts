@@ -159,7 +159,25 @@ export async function POST(request: Request) {
       : await handleProductionMode(sanitizedData);
 
     return NextResponse.json(result, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    // Duplicate email: Postgres unique violation (23505) or SQLite
+    // constraint (SQLITE_CONSTRAINT_UNIQUE). Surface a friendly message —
+    // the raw DB error is internal.
+    if (
+      error?.code === '23505' ||
+      error?.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+      (typeof error?.message === 'string' &&
+        error.message.includes('customers_email_unique'))
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'This email address is already registered. Please use a different email, or contact iVALT support if you believe this is a mistake.',
+        },
+        { status: 409 }
+      );
+    }
+
     console.error('Signup error:', error);
     return NextResponse.json(
       { error: 'Failed to process signup' },
