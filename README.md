@@ -82,6 +82,7 @@ pnpm dev          # Start development server (Turbopack)
 pnpm build        # Production build
 pnpm start        # Start production server
 pnpm lint         # Run ESLint
+pnpm test         # Run Vitest test suite
 pnpm db:push      # Push schema to database
 pnpm db:studio    # Open Drizzle Studio
 pnpm db:generate  # Generate migration files
@@ -92,31 +93,52 @@ pnpm db:generate  # Generate migration files
 ```
 ondemandid-org/
 ├── app/                    # Next.js App Router
-│   ├── api/               # API routes (signup, verify, status)
+│   ├── api/               # API routes
+│   │   ├── admin/         # Admin authentication & management
+│   │   ├── health/        # Health check endpoints
+│   │   ├── signup/        # POST /api/signup
+│   │   ├── verify/        # POST /api/verify
+│   │   ├── status/[id]/   # GET /api/status/:id
+│   │   └── rpc/           # Internal RPC endpoints
 │   ├── globals.css        # Global styles & design tokens
 │   ├── layout.tsx         # Root layout with providers
 │   ├── page.tsx           # Landing page
 │   ├── signup/            # Signup page
+│   ├── admin/             # Admin dashboard pages
 │   └── ondemand-id/       # Verification page
 ├── components/
-│   ├── ui/                # Reusable UI components
-│   ├── landing/           # Landing page sections
+│   ├── ui/                # Reusable UI components (Button, Input, Card, etc.)
+│   ├── landing/           # Landing page sections (Hero, Features, etc.)
 │   ├── signup/            # Signup form components
 │   ├── verification/      # Verification form components
-│   ├── site-header.tsx    # Navigation header
-│   ├── site-footer.tsx    # Footer
-│   └── theme-provider-custom.tsx  # Theme context
+│   ├── admin/             # Admin dashboard components
+│   ├── site-header.tsx    # Navigation header with theme-aware logo
+│   ├── site-footer.tsx    # Footer with theme-aware logo
+│   ├── theme-provider-custom.tsx  # Custom theme context
+│   └── query-provider.tsx  # React Query provider
 ├── hooks/                 # Custom React hooks
 ├── lib/
 │   ├── db/                # Drizzle ORM database layer
-│   ├── email/             # Email system
+│   │   ├── queries/       # Database query functions
+│   │   └── schema.*.ts    # PostgreSQL & SQLite schemas
+│   ├── email/             # Email system with templates
 │   ├── ivalt/             # iVALT API client
+│   ├── admin/             # Admin authentication utilities
+│   ├── security.ts        # Rate limiting, XSS prevention, CAPTCHA
 │   ├── utils.ts           # cn() helper
 │   └── validation.ts      # Zod schemas
+├── tests/                 # Vitest test suite
+│   ├── validation.test.ts
+│   ├── ivalt-client.test.ts
+│   ├── signup-route-prod.test.ts
+│   ├── verify-route-demo.test.ts
+│   ├── verify-route-prod.test.ts
+│   ├── status-route-demo.test.ts
+│   └── status-route-prod.test.ts
 ├── docs/                  # Documentation
-│   ├── PRD.md             # Technical PRD
-│   ├── PRD-CUSTOMER.md    # Customer-facing PRD
-│   └── DESIGN.md          # Design system
+│   ├── PRD.md
+│   ├── PRD-CUSTOMER.md
+│   └── DESIGN.md
 ├── public/                # Static assets (logos)
 └── next.config.mjs        # Next.js configuration
 ```
@@ -154,11 +176,25 @@ ondemandid-org/
 
 ## API Endpoints
 
-| Method | Endpoint           | Description              |
-| ------ | ------------------ | ------------------------ |
-| POST   | `/api/signup`      | Customer registration    |
-| POST   | `/api/verify`      | Initiate biometric check |
-| GET    | `/api/status/[id]` | Poll verification status |
+### Public Endpoints
+
+| Method | Endpoint           | Description                      |
+| ------ | ------------------ | -------------------------------- |
+| POST   | `/api/signup`      | Customer registration            |
+| POST   | `/api/verify`      | Initiate biometric check         |
+| GET    | `/api/status/[id]` | Poll verification status         |
+| GET    | `/api/health`      | Basic health check               |
+| GET    | `/api/health/detailed` | Detailed health (requires token) |
+
+### Admin Endpoints
+
+| Method | Endpoint                     | Description                     |
+| ------ | ---------------------------- | ------------------------------- |
+| POST   | `/api/admin/login`           | Initiate admin biometric login  |
+| GET    | `/api/admin/login-status`    | Poll admin login status         |
+| POST   | `/api/admin/logout`          | Clear admin session             |
+| GET    | `/api/admin/session`         | Check admin session status      |
+| POST   | `/api/rpc`                   | Internal RPC (stats, queries)   |
 
 ## Demo Mode
 

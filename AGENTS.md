@@ -38,25 +38,37 @@ iVALT OnDemand ID is a Next.js 16 enterprise SaaS application for password-free 
 ondemandid-org/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API routes
+│   │   ├── admin/         # Admin authentication & management
+│   │   │   ├── login/     # POST /api/admin/login
+│   │   │   ├── logout/    # POST /api/admin/logout
+│   │   │   ├── session/   # GET /api/admin/session
+│   │   │   └── login-status/ # GET /api/admin/login-status
+│   │   ├── health/        # Health check endpoints
+│   │   │   ├── route.ts   # GET /api/health (basic)
+│   │   │   └── detailed/  # GET /api/health/detailed (requires token)
 │   │   ├── signup/        # POST /api/signup - Customer registration
 │   │   ├── verify/        # POST /api/verify - Initiate biometric check
-│   │   └── status/[id]/   # GET /api/status/:id - Poll verification status
+│   │   ├── status/[id]/   # GET /api/status/:id - Poll verification status
+│   │   └── rpc/           # POST /api/rpc - Internal RPC endpoints
 │   ├── globals.css        # Global styles, design tokens, animations
 │   ├── layout.tsx         # Root layout with providers
 │   ├── page.tsx           # Landing page
 │   ├── signup/            # Signup page
+│   ├── admin/             # Admin dashboard pages
 │   └── ondemand-id/       # Verification page
 ├── components/
-│   ├── ui/                # Reusable UI components (Button, Input, etc.)
+│   ├── ui/                # Reusable UI components (Button, Input, Card, etc.)
 │   ├── landing/           # Landing page sections (Hero, Features, etc.)
 │   ├── signup/            # Signup form components
 │   ├── verification/      # Verification form components
+│   ├── admin/             # Admin dashboard components
 │   ├── site-header.tsx    # Navigation header with theme-aware logo
 │   ├── site-footer.tsx    # Footer with theme-aware logo
 │   ├── theme-provider-custom.tsx  # Custom theme context (replaces next-themes)
 │   └── query-provider.tsx  # React Query provider
 ├── hooks/
 │   ├── use-api.ts         # React Query hooks for API calls
+│   ├── use-admin-*.ts     # Admin-specific React Query hooks
 │   ├── use-mobile.ts      # Mobile detection hook
 │   ├── use-reveal.ts      # IntersectionObserver scroll reveal
 │   └── use-toast.ts       # Toast notification helpers
@@ -64,27 +76,43 @@ ondemandid-org/
 │   ├── db/                # Drizzle ORM database layer
 │   │   ├── index.ts       # Database client initialization
 │   │   ├── schema.pg.ts   # PostgreSQL schema
-│   │   └── schema.sqlite.ts # SQLite schema
+│   │   ├── schema.sqlite.ts # SQLite schema
+│   │   └── queries/       # Database query functions (customers, requests, stats)
 │   ├── email/             # Email system
-│   │   ├── transport.ts   # Email transport setup
+│   │   ├── transport.ts   # Email transport setup (SES + SMTP fallback)
 │   │   ├── send.ts        # Email sending functions
 │   │   └── templates/     # HTML email templates
 │   ├── ivalt/             # iVALT API client
-│   │   ├── client.ts      # API functions
+│   │   ├── client.ts      # API functions (triggerAuthRequest, getAuthResult)
 │   │   ├── types.ts       # TypeScript interfaces
 │   │   └── index.ts       # Barrel export
+│   ├── admin/             # Admin authentication utilities
+│   │   └── auth.ts        # Session token creation/verification, cookie management
+│   ├── captcha/           # CAPTCHA verification (Turnstile, reCAPTCHA)
+│   ├── orpc/              # Internal RPC router and client
 │   ├── country-codes.ts   # Country dialing codes data
+│   ├── security.ts        # Rate limiting, XSS prevention, CAPTCHA verification
 │   ├── utils.ts           # cn() helper (clsx + tailwind-merge)
 │   ├── validation.ts      # Zod schemas for forms
 │   └── sim-store.ts       # In-memory store for demo mode
+├── tests/                 # Vitest test suite
+│   ├── validation.test.ts
+│   ├── ivalt-client.test.ts
+│   ├── signup-route-prod.test.ts
+│   ├── verify-route-demo.test.ts
+│   ├── verify-route-prod.test.ts
+│   ├── status-route-demo.test.ts
+│   └── status-route-prod.test.ts
 ├── docs/
 │   ├── PRD.md             # Technical PRD
-│   └── PRD-CUSTOMER.md    # Customer-facing PRD
+│   ├── PRD-CUSTOMER.md    # Customer-facing PRD
+│   └── SYSTEM_ARCHITECTURE.md # System architecture docs
 ├── DESIGN.md              # Design system documentation
 ├── public/                # Static assets
 │   ├── logo-light.png     # iVALT logo (light mode)
 │   └── logo-dark.webp     # iVALT logo (dark mode)
 ├── .env.example           # Environment variable template
+├── vitest.config.ts       # Vitest configuration
 ├── drizzle.config.ts      # Drizzle Kit configuration
 └── next.config.mjs        # Next.js config (unoptimized images, ignore TS errors)
 ```
@@ -243,10 +271,39 @@ When `DEMO_MODE=true`:
 pnpm dev          # Start development server (Turbopack)
 pnpm build        # Production build
 pnpm lint         # ESLint check
+pnpm test         # Run Vitest test suite
 pnpm db:push      # Push schema to database
 pnpm db:studio    # Open Drizzle Studio
 pnpm db:generate  # Generate migration files
 ```
+
+### Test Suite
+
+The project uses **Vitest** for unit and integration tests. Tests cover:
+
+- **Validation**: Zod schemas for signup and verification forms
+- **iVALT Client**: Status mapping and API request/response handling
+- **API Routes**: Signup, verify, and status endpoints in both demo and production modes
+- **Database**: SQLite in-memory tests for production mode routes
+
+Run tests with `pnpm test` or `pnpm vitest run` for CI mode.
+
+### Adding New UI Components
+
+1. Create file in `components/ui/`
+2. Use `cn()` for className merging
+3. Add `data-slot` attribute for styling hooks
+4. Export from barrel if needed
+5. Follow existing patterns for variants (use `cva` for complex variants)
+6. Ensure buttons include `cursor-pointer` for consistent UX
+
+### Adding New API Routes
+
+1. Create route in `app/api/[route]/route.ts`
+2. Validate input with Zod schemas from `lib/validation.ts`
+3. Check `DEMO_MODE` for simulated responses
+4. Return consistent error/success response shapes
+5. Add tests in `tests/` directory
 
 ### Adding New UI Components
 

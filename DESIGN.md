@@ -237,6 +237,15 @@ Transition: `600ms cubic-bezier(0.22, 1, 0.36, 1)` for both opacity and transfor
 
 ## Patterns
 
+### Buttons
+
+- All buttons include `cursor-pointer` for consistent hover feedback
+- Base classes: `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all cursor-pointer`
+- Variants: default, destructive, outline, secondary, ghost, link
+- Sizes: default, sm, lg, icon, icon-sm, icon-lg
+- Disabled state: `disabled:pointer-events-none disabled:opacity-50`
+- Focus visible: `focus-visible:ring-ring/50 focus-visible:ring-[3px]`
+
 ### Status Indicators
 
 - **Pending**: Pulsing dot (`animate-pulse bg-primary`)
