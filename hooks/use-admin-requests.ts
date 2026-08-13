@@ -14,18 +14,51 @@ export function useAdminRequests(
   );
 }
 
+interface RequestsListData {
+  requests: Array<{ id: string | number }>;
+  total: number;
+}
+
 export function useAdminDeleteRequest() {
   const queryClient = useQueryClient();
 
   return useMutation({
     ...orpc.requests.delete.mutationOptions(),
+    onMutate: async variables => {
+      await queryClient.cancelQueries({ queryKey: ['requests', 'list'] });
+
+      const previous = queryClient.getQueriesData<RequestsListData>({
+        queryKey: ['requests', 'list'],
+      });
+
+      queryClient.setQueriesData<RequestsListData>(
+        { queryKey: ['requests', 'list'] },
+        old =>
+          old
+            ? {
+                ...old,
+                requests: old.requests.filter(
+                  r => String(r.id) !== String(variables.id)
+                ),
+                total: Math.max(0, old.total - 1),
+              }
+            : old
+      );
+
+      return { previous };
+    },
+    onError: (error: Error, _variables, context) => {
+      if (context?.previous) {
+        for (const [key, data] of context.previous) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+      toast.error(error.message || 'Failed to delete request');
+    },
     onSuccess: () => {
       toast.success('Request deleted successfully');
-      queryClient.invalidateQueries({ queryKey: ['admin-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete request');
+      queryClient.invalidateQueries({ queryKey: ['requests', 'list'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });
 }
