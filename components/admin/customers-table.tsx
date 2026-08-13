@@ -21,9 +21,10 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table';
-import { Users, Search, Building2 } from 'lucide-react';
-import { useAdminCustomers } from '@/hooks/use-admin-customers';
+import { Users, Search, Building2, Trash2 } from 'lucide-react';
+import { useAdminCustomers, useAdminDeleteCustomer } from '@/hooks/use-admin-customers';
 import { CustomerEditDialog } from './customer-edit-dialog';
+import { DeleteConfirmDialog } from './delete-confirm-dialog';
 import { Pagination } from './pagination';
 
 interface Customer {
@@ -71,6 +72,7 @@ export function CustomersTable() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
 
   const { data, isLoading } = useAdminCustomers(
     statusFilter !== 'all' ? statusFilter : undefined,
@@ -78,6 +80,8 @@ export function CustomersTable() {
     page,
     pageSize
   );
+
+  const deleteMutation = useAdminDeleteCustomer();
 
   const customers: Customer[] = useMemo(() => data?.customers ?? [], [data]);
   const total: number = useMemo(() => data?.total ?? 0, [data]);
@@ -213,13 +217,24 @@ export function CustomersTable() {
                       {formatDate(customer.createdAt)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedCustomer(customer)}
-                      >
-                        Manage
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedCustomer(customer)}
+                        >
+                          Manage
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-muted-foreground hover:text-destructive"
+                          aria-label={`Delete ${customer.companyName}`}
+                          onClick={() => setDeleteTarget(customer)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -249,6 +264,22 @@ export function CustomersTable() {
         <CustomerEditDialog
           customer={selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <DeleteConfirmDialog
+          title="Delete customer?"
+          description={`${deleteTarget.companyName} (${deleteTarget.email}) will be permanently hidden from the admin panel. Verification requests for this customer are not affected.`}
+          isPending={deleteMutation.isPending}
+          onConfirm={() =>
+            deleteMutation.mutate(
+              { id: String(deleteTarget.id) },
+              { onSuccess: () => setDeleteTarget(null) }
+            )
+          }
+          onClose={() => setDeleteTarget(null)}
         />
       )}
     </>

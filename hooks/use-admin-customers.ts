@@ -46,3 +46,19 @@ export function useAdminCreateCustomer() {
     },
   });
 }
+
+export function useAdminDeleteCustomer() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...orpc.customers.delete.mutationOptions(),
+    onSuccess: () => {
+      toast.success('Customer deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-customers'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete customer');
+    },
+  });
+}

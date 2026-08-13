@@ -19,8 +19,10 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui/table';
-import { FileText, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { useAdminRequests } from '@/hooks/use-admin-requests';
+import { FileText, CheckCircle2, XCircle, Clock, Trash2 } from 'lucide-react';
+import { useAdminRequests, useAdminDeleteRequest } from '@/hooks/use-admin-requests';
+import { Button } from '@/components/ui/button';
+import { DeleteConfirmDialog } from './delete-confirm-dialog';
 import { Pagination } from './pagination';
 
 interface VerificationRequest {
@@ -83,6 +85,10 @@ export function AdminRequests() {
     page,
     pageSize
   );
+
+  const deleteMutation = useAdminDeleteRequest();
+  const [deleteTarget, setDeleteTarget] =
+    useState<VerificationRequest | null>(null);
 
   const requests: VerificationRequest[] = useMemo(
     () => (data as { requests?: VerificationRequest[] })?.requests ?? [],
@@ -196,15 +202,15 @@ export function AdminRequests() {
           {isLoading ? (
             <div className="p-0">
               <div className="border-b px-4 py-3">
-                <div className="grid grid-cols-8 gap-4">
-                  {Array.from({ length: 8 }).map((_, i) => (
+                <div className="grid grid-cols-9 gap-4">
+                  {Array.from({ length: 9 }).map((_, i) => (
                     <Skeleton key={i} className="h-4" />
                   ))}
                 </div>
               </div>
               <div className="divide-y">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="grid grid-cols-8 gap-4 px-4 py-3">
+                  <div key={i} className="grid grid-cols-9 gap-4 px-4 py-3">
                     <Skeleton className="h-5 w-24 rounded" />
                     <Skeleton className="h-4 w-28" />
                     <Skeleton className="h-5 w-20 rounded-full" />
@@ -213,6 +219,7 @@ export function AdminRequests() {
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-4 w-32" />
                     <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-8 w-20 rounded-md" />
                   </div>
                 ))}
               </div>
@@ -237,6 +244,7 @@ export function AdminRequests() {
                   <TableHead>Created</TableHead>
                   <TableHead>Completed</TableHead>
                   <TableHead>Duration</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -270,6 +278,17 @@ export function AdminRequests() {
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDuration(req.createdAt, req.completedAt)}
                     </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-destructive"
+                        aria-label={`Delete request ${req.idConnection}`}
+                        onClick={() => setDeleteTarget(req)}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -290,6 +309,22 @@ export function AdminRequests() {
             setPageSize(size);
             setPage(1);
           }}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <DeleteConfirmDialog
+          title="Delete request?"
+          description={`Verification request ${deleteTarget.idConnection} (${deleteTarget.countryCode} ${deleteTarget.mobile}) will be permanently hidden from the admin panel. Ongoing verification flows for this request will resolve to not found.`}
+          isPending={deleteMutation.isPending}
+          onConfirm={() =>
+            deleteMutation.mutate(
+              { id: String(deleteTarget.id) },
+              { onSuccess: () => setDeleteTarget(null) }
+            )
+          }
+          onClose={() => setDeleteTarget(null)}
         />
       )}
     </div>
